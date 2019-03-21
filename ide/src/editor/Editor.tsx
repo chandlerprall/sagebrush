@@ -37,10 +37,9 @@ John, Francine, Meghan;
 
 #expr JsonLiteral = (?<value>NUMERIC_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL)
 
-{"name": "Chandler", "age": 30, "children": [
-    {"name":"Roan", "age": 7},
-    {"name" : "Griffin", "age":4},
-    { "name": "Callan", "age":2 }
+{"name": "John", "age": 33, "children": [
+    {"name":"Meghan", "age": 12},
+    {"name" : "Charles", "age":6}
 ]}
 `
 };

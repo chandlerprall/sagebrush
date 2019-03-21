@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const webpack = require('webpack');
 
-const isProduction = false;
+const isProduction = true;
 const context = path.resolve(__dirname, 'src');
 
 module.exports = {

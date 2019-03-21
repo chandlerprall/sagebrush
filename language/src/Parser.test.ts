@@ -26,7 +26,7 @@ describe('Parser', () => {
 
 #expr JsonLiteral = (?<value>NUMERIC_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL)
 
-[{"name": "Chandler", "age": 30}, true]
+[{"name": "John", "age": 30}, true]
         `);
             scanner.scan();
             // scanner.tokens.forEach(token => console.log(token.toString()));
