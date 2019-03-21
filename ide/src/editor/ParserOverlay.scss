@@ -1,0 +1,37 @@
+.overlay {
+  width: 400px;
+  font-size: 16px;
+  line-height: 1.3rem;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.node-null, .node-undefined {
+  color: #aaa;
+}
+
+.node-string {
+  color: #66aa66
+}
+
+.node-number {
+  color: #aa6666;
+}
+
+.node-boolean {
+  color: #6666aa;
+}
+
+.node-object, .node-array {
+  color: #666;
+  cursor: pointer;
+}
+
+.node-object + ul, .node-array + ul {
+  list-style: none;
+  padding-left: 25px;
+  margin: 0;
+}
+
+.mono {
+  font-family: monospace;
+}

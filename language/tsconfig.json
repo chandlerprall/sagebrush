@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": "src",
+    "outDir": "lib",
+    "module": "commonjs",
+    "target": "es5",
+    "strict": true,
+    "declaration": true,
+    "declarationDir": "types",
+    "lib": ["es2015"],
+    "moduleResolution": "node"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["src/**/*.test.ts"]
+}

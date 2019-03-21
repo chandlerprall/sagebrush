@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "workspaces": [
+    "ide",
+    "language",
+		"rex"
+  ]
+}
