@@ -1,7 +1,7 @@
 {
   "name": "@sagebrush/ide",
   "version": "0.0.1",
-  "license": "private",
+	"license": "MIT",
 	"scripts": {
 		"dev": "webpack-dev-server -c webpack.config.js"
 	},

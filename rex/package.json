@@ -1,7 +1,7 @@
 {
   "name": "@sagebrush/rex",
   "version": "0.0.1",
-  "license": "private",
+  "license": "MIT",
   "main": "lib",
   "types": "types",
 	"scripts": {
