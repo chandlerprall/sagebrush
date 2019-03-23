@@ -1,4 +1,5 @@
 import * as RexAst from './rexAst';
+import {GroupType} from './rexAst';
 
 function codePointFromChars(chars: string) {
     // if single (two-byte) character, use JS built-in
@@ -131,17 +132,18 @@ export class NegatedMatcher implements Matcher {
     }
 }
 
-class StateConnection {
+export class StateConnection {
     constructor(public matcher: Matcher, public node: StateNode) {}
 }
 
 let nextMatchCounterId = 0;
 let nextNodeId = 0;
-class StateNode {
+export class StateNode {
     public nodeId = nextNodeId++;
     public captureNames: Set<string> = new Set();
     public connections: StateConnection[] = [];
     public matchCounterId?: number;
+    public appendMatch: boolean = true;
 
     connect(matcher: Matcher, node: StateNode) {
         this.connections.push(new StateConnection(matcher, node));
@@ -167,9 +169,21 @@ class StateNode {
             this.connections[i].node.addCaptureNames(names, processedNodes);
         }
     }
+
+    setAppendMatch(appendMatch: boolean, processedNodes: Set<StateNode> = new Set()) {
+        if (processedNodes.has(this)) return;
+
+        processedNodes.add(this);
+
+        this.appendMatch = appendMatch;
+
+        for (let i = 0; i < this.connections.length; i++) {
+            this.connections[i].node.setAppendMatch(appendMatch, processedNodes);
+        }
+    }
 }
 
-class EndStateNode extends StateNode {}
+export class EndStateNode extends StateNode {}
 
 const MATCH_STATUS_INITIALIZED = Symbol('MATCH_STATUS_INITIALIZED');
 const MATCH_STATUS_SUCCESS = Symbol('MATCH_STATUS_SUCCESS');
@@ -212,6 +226,8 @@ class MatchState {
         public matchCounters: number[] = [],
         public captures: {[key: string]: string} = {},
         private seenStates: Set<string> = new Set(),
+        private matchedText = '',
+        public totalConsumedLength = 0
     ) {}
 
     advance() {
@@ -234,6 +250,8 @@ class MatchState {
             if (connection.matcher.matches(nextChar)) {
                 if (connection.matcher instanceof EmptyMatcher === false || connection.node !== this.node) {
                     const connectedNode = connection.node;
+                    const appendMatch = connection.node.appendMatch;
+
                     // increment any active match counter
                     const applyMatchCounter = connection.matcher.consumes && connectedNode.matchCounterId !== undefined;
                     const matchCounters = applyMatchCounter ? [...this.matchCounters] : this.matchCounters; // only clone if being modified
@@ -243,7 +261,7 @@ class MatchState {
                     }
 
                     // append character to any active capture groups
-                    const applyCaptures = connection.matcher.consumes && connectedNode.captureNames.size > 0;
+                    const applyCaptures = appendMatch && connection.matcher.consumes && connectedNode.captureNames.size > 0;
                     const captures = applyCaptures ? {...this.captures} : this.captures; // only clone if being modified
                     if (applyCaptures) {
                         connectedNode.captureNames.forEach(name => {
@@ -252,6 +270,7 @@ class MatchState {
                         });
                     }
 
+                    const matchedText = connection.matcher.consumes ? (appendMatch ? this.matchedText + (nextChar || '') : this.matchedText) : this.matchedText;
                     this.nextStates.push(new MatchState(
                         connectedNode,
                         this.against,
@@ -260,6 +279,8 @@ class MatchState {
                         matchCounters,
                         captures,
                         this.seenStates,
+                        matchedText,
+                        this.totalConsumedLength + (connection.matcher.consumes ? 1 : 0)
                     ));
                 }
             }
@@ -287,7 +308,7 @@ class MatchState {
     }
 
     getMatchedText() {
-        return this.against.substring(this.cursorStart, this.cursor);
+        return this.matchedText;
     }
 
     get isAtEndOfInputString() {
@@ -390,6 +411,11 @@ export default class Rex {
                 matcher = new EmptyMatcher();
                 const groupTree = Rex.buildFromMembers(member.members, new StateNode());
                 groupTree.addCaptureNames(member.captureNames);
+
+                if (member.type === GroupType.LOOKAHEAD) {
+                    groupTree.setAppendMatch(false);
+                }
+
                 // entryNode is the group entry
                 entryNode = groupTree;
                 exitNode = collectExitNode(groupTree);
@@ -523,14 +549,14 @@ export default class Rex {
 
             if (state.isAtEnd) {
                 const match = state.getMatchedText();
-                if (bestMatch === undefined || match.length > bestMatchLength) {
+                if (bestMatch === undefined || state.totalConsumedLength >= bestMatchLength) {
                     if (!this.isBoundToEnd || state.isAtEndOfInputString) {
                         if (bestMatch === undefined) {
                             bestMatch = state;
-                            bestMatchLength = match.length;
+                            bestMatchLength = state.totalConsumedLength;
                         } else if (isNewCountersBetter(bestMatch.matchCounters, state.matchCounters)) {
                             bestMatch = state;
-                            bestMatchLength = match.length;
+                            bestMatchLength = state.totalConsumedLength;
                         }
                     }
                 }

@@ -1,9 +1,11 @@
 import * as React from 'react';
+import {EuiPanel, EuiTitle} from '@elastic/eui';
 import {Parser} from '@sagebrush/language';
 import './ParserOverlay.scss';
 
 interface ParserOverlayNodeProps {
     node: any;
+    startOpen?: boolean;
 }
 
 interface ParserOverlayNodeState {
@@ -13,7 +15,7 @@ interface ParserOverlayNodeState {
 class ParserOverlayNode extends React.Component<ParserOverlayNodeProps, ParserOverlayNodeState> {
     constructor(props: ParserOverlayNodeProps, state: ParserOverlayNodeState) {
         super(props, state);
-        this.state = { isOpen: false };
+        this.state = { isOpen: props.startOpen || false };
     }
 
     toggleIsOpen = () => this.setState({ isOpen: !this.state.isOpen })
@@ -78,7 +80,7 @@ interface ParserOverlayProps {
 
 export default function ParserOverlay({ scanErrors, result }: ParserOverlayProps) {
     return (
-        <div styleName="overlay">
+        <EuiPanel styleName="overlay">
             {
                 scanErrors.length > 0
                     ? (
@@ -96,11 +98,13 @@ export default function ParserOverlay({ scanErrors, result }: ParserOverlayProps
                 ? result.toString()
                 : (
                     <React.Fragment>
-                        <h2>Parse Results</h2>
-                        <ParserOverlayNode node={result}/>
+                        <EuiTitle>
+                            <h2>Parse Results</h2>
+                        </EuiTitle>
+                        <ParserOverlayNode startOpen={true} node={result}/>
                     </React.Fragment>
                 )
             }
-        </div>
+        </EuiPanel>
     );
 }

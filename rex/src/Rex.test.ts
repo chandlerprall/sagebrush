@@ -57,7 +57,7 @@ describe('Rex', () => {
             expect(rex.match('foorbarr')).toEqual({ text: 'foorbar', captures: {} });
         });
 
-        it('matches word charact3ers', () => {
+        it('matches word characters', () => {
             const rex = new Rex('foo\\wbar');
             expect(rex.match('foobar')).toBeUndefined();
             expect(rex.match('foo bar')).toBeUndefined();
@@ -183,6 +183,23 @@ describe('Rex', () => {
             expect(rex.match('B')).toEqual({ text: 'B', captures: {} });
             expect(rex.match('C')).toEqual({ text: 'C', captures: {} });
             expect(rex.match('D')).toBeUndefined();
+        });
+
+        it('allows an unescaped dash at the end', () => {
+            const rex = new Rex('[ab-]');
+            expect(rex.match('a')).toEqual({ text: 'a', captures: {} });
+            expect(rex.match('b')).toEqual({ text: 'b', captures: {} });
+            expect(rex.match('-')).toEqual({ text: '-', captures: {} });
+            expect(rex.match('c')).toBeUndefined();
+        });
+
+        it('allows an escaped dash in the middle', () => {
+            const rex = new Rex('[a\\-z]');
+            expect(rex.match('a')).toEqual({ text: 'a', captures: {} });
+            expect(rex.match('z')).toEqual({ text: 'z', captures: {} });
+            expect(rex.match('-')).toEqual({ text: '-', captures: {} });
+            expect(rex.match('b')).toBeUndefined();
+            expect(rex.match('y')).toBeUndefined();
         });
 
         it('matches digit sets', () => {
@@ -612,6 +629,27 @@ describe('Rex', () => {
             expect(rex.match('acd')).toEqual({ text: 'acd', captures: {} });
             expect(rex.match('aabd')).toBeUndefined();
             expect(rex.match('acde')).toBeUndefined();
+        });
+    });
+
+    describe('lookahead assertion', () => {
+        it('matches lookahead without reporting the match', () => {
+            const rex = new Rex('foo(?=bar)');
+            expect(rex.match('foobar')).toEqual({ text: 'foo', captures: {} });
+            expect(rex.match('foobarr')).toEqual({ text: 'foo', captures: {} });
+            expect(rex.match('foo')).toBeUndefined();
+        });
+
+        it('captures only expected text', () => {
+            const rex = new Rex('(?<value>[^\\|]+?)\\s+(?=\\|)');
+            expect(rex.match('Test   |')).toEqual({ text: 'Test   ', captures: { value: 'Test' } });
+            expect(rex.match('A Test    |')).toEqual({ text: 'A Test    ', captures: { value: 'A Test' } });
+        });
+
+        it('captures only expected text (2)', () => {
+            const rex = new Rex('(?<value>[^\\|]+?)(?=\\s+\\|)');
+            expect(rex.match('Test   |')).toEqual({ text: 'Test', captures: { value: 'Test' } });
+            expect(rex.match('A Test    |')).toEqual({ text: 'A Test', captures: { value: 'A Test' } });
         });
     });
 

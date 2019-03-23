@@ -19,6 +19,7 @@
 * alternatives/or `|`
 * groups `()`
 * named capture groups `(?<capturename>)` - see [Named capture groups](#named-capture-groups)
+* lookahead assertions `foo(?=bar)`
 
 ## Usage
 

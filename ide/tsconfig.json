@@ -4,6 +4,8 @@
     "rootDir": "src",
     "strict": true,
     "lib": ["dom", "es2015"],
+    "esModuleInterop": true,
+    "keyofStringsOnly": true,
     "moduleResolution": "node",
     "noEmit": true,
     "noImplicitAny": true,

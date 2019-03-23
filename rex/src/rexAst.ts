@@ -33,7 +33,7 @@ export type MATCH_TYPE =
     typeof MATCH_TYPE_ZERO_OR_MORE |
     typeof MATCH_TYPE_ONE_OR_MORE;
 
-class RexNode {
+export class RexNode {
     matchType: MATCH_TYPE = MATCH_TYPE_NORMAL;
     isNonGreedy: boolean = false;
 
@@ -67,8 +67,13 @@ export class RexNotDigit extends RexNode {}
 export class RexWord extends RexNode {}
 export class RexNotWord extends RexNode {}
 
+export enum GroupType {
+    NORMAL = 'NORMAL',
+    LOOKAHEAD = 'LOOKAHEAD',
+}
+
 export class RexGroup extends RexNode {
-    constructor(public members: RexAstNode[], public captureNames: string[] = []) {
+    constructor(public members: RexAstNode[], public captureNames: string[], public type: GroupType) {
         super();
     }
 }
@@ -153,28 +158,36 @@ export function parseRexAst(regex: string, captureGroups: string[] = []): RexAst
             let captureName: string | undefined = undefined;
             let groupSequence = '';
             let validSequence = false;
+            let groupType = GroupType.NORMAL;
 
             const peek = regex[i + 1];
             if (peek === '?') {
-                // this is a capture group
-                if (regex[i + 2] !== '<') throw new Error('Invalid capture group name');
+                const peekAgain = regex[i + 2];
 
-                i += 3;
-                // scan until end of name
-                for (i; i < regex.length; i++) {
-                    const char = regex[i];
-                    if (char === '>') {
-                        // end of capture name
-                        break;
-                    }
+                if (peekAgain === '<') {
+                    i += 3;
+                    // this is a capture group
+                    // scan until end of name
+                    for (i; i < regex.length; i++) {
+                        const char = regex[i];
+                        if (char === '>') {
+                            // end of capture name
+                            break;
+                        }
 
-                    // validate character then append it to the capture name
-                    if (char.match(/[a-zA-Z0-9_]/) == null) throw new Error('Invalid capture group name');
-                    if (captureName === undefined) {
-                        captureName = char;
-                    } else {
-                        captureName += char;
+                        // validate character then append it to the capture name
+                        if (char.match(/[a-zA-Z0-9_]/) == null) throw new Error('Invalid capture group name');
+                        if (captureName === undefined) {
+                            captureName = char;
+                        } else {
+                            captureName += char;
+                        }
                     }
+                } else if (peekAgain === '=') {
+                    i += 2;
+                    groupType = GroupType.LOOKAHEAD;
+                } else {
+                    throw new Error(`Invalid group modifier "${peekAgain}"`);
                 }
             }
 
@@ -201,7 +214,7 @@ export function parseRexAst(regex: string, captureGroups: string[] = []): RexAst
             if (captureName !== undefined) {
                 cgroups.push(captureName);
             }
-            member = new RexGroup(parseRexAst(groupSequence, cgroups), cgroups);
+            member = new RexGroup(parseRexAst(groupSequence, cgroups), cgroups, groupType);
         } else if (char === ')') {
             throw new Error('Unexpected token ")"')
         } else if (char === '[') {
@@ -220,12 +233,6 @@ export function parseRexAst(regex: string, captureGroups: string[] = []): RexAst
                 if (char === ']') {
                     isValidSet = true;
                     break;
-                } else if (char === '^' && i === firstCharacterIndex) {
-                    isNegated = true;
-                } else if (regex[i+1] === '-' && regex.length > i+2) {
-                    const secondChar = unicodeRead(regex, i + 2)!;
-                    ranges.push([char, secondChar]);
-                    i += 1 + secondChar.length;
                 } else if (char === '\\') {
                     const escapedChar = regex[++i];
 
@@ -250,6 +257,12 @@ export function parseRexAst(regex: string, captureGroups: string[] = []): RexAst
                     } else {
                         chars.push(escapedChar);
                     }
+                } else if (char === '^' && i === firstCharacterIndex) {
+                    isNegated = true;
+                } else if (regex[i+1] === '-' && regex[i+2] !== ']') {
+                    const secondChar = unicodeRead(regex, i + 2)!;
+                    ranges.push([char, secondChar]);
+                    i += 1 + secondChar.length;
                 } else {
                     chars.push(char);
                 }

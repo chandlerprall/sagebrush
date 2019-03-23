@@ -1,6 +1,26 @@
 import * as React from 'react';
 import {createPortal} from 'react-dom';
 import * as monaco from 'monaco-editor';
+import {
+    EuiButtonEmpty,
+    EuiCode,
+    EuiCodeBlock,
+    EuiHeader,
+    EuiHeaderSection,
+    EuiHeaderSectionItem,
+    EuiHeaderSectionItemButton,
+    EuiIcon,
+    EuiLink,
+    EuiModal,
+    EuiModalHeader,
+    EuiModalHeaderTitle,
+    EuiModalBody,
+    EuiModalFooter,
+    EuiOverlayMask,
+    EuiPanel,
+    EuiSpacer,
+    EuiText
+} from '@elastic/eui';
 import {Parser} from '@sagebrush/language';
 import ParserOverlay from './ParserOverlay';
 import './Editor.scss';
@@ -16,31 +36,67 @@ const presets = {
 John, Francine, Meghan;
 `,
     json: `
-#token LEFT_BRACE {
-#token RIGHT_BRACE }
-#token LEFT_BRACKET \\[
-#token RIGHT_BRACKET \\]
-#token COLON :
+// JSON parser following the spec at https://www.json.org/
+
+#token NUMBER (?<value>-?(\\d|[1-9]\\d+)(\\.\\d+)?([eE](+|-)?\\d+)?)
+#token STRING "(?<value>([^\\\\"]|\\\\(["\\\\/bfnrt]|u\\d\\d\\d\\d))*)"
+#token BOOLEAN (?<value>true|false)
+#token NULL null
+
+#token LEFT_PAREN \\[
+#token RIGHT_PAREN \\]
 #token COMMA ,
 
-#expr JsonArray = LEFT_BRACKET ((?<values>JsonValue) (COMMA (?<values>JsonValue))*)? RIGHT_BRACKET
-#expr JsonObject = LEFT_BRACE ((?<values>JsonObjectAssignment) (COMMA (?<values>JsonObjectAssignment))*)? RIGHT_BRACE
+#token LEFT_BRACE {
+#token RIGHT_BRACE }
+#token COLON :
 
-#expr JsonObjectAssignment = (?<key>STRING_LITERAL) COLON (?<value>JsonValue)
+#expr Array = LEFT_PAREN ( (?<values>Value) ( COMMA (?<values>Value) )* )? RIGHT_PAREN
 
-#expr JsonValue = (?<value>JsonLiteral | JsonArray | JsonObject)
+#expr Object = LEFT_BRACE ( (?<assignments>ObjectAssignment) ( COMMA (?<assignments>ObjectAssignment) )* )? RIGHT_BRACE
+#expr ObjectAssignment = (?<key>STRING) COLON (?<value>Value)
 
-// Literals
-#token NUMERIC_LITERAL (?<raw>-?\\d+(\\.\\d+)?)
-#token BOOLEAN_LITERAL (?<raw>true|false)
-#token STRING_LITERAL "(?<raw>([^\\\\]|\\\\.)*?)"
+#expr Value = (?<value>Object|Array|NUMBER|STRING|BOOLEAN|NULL)
 
-#expr JsonLiteral = (?<value>NUMERIC_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL)
+{
+    "books": [
+        {
+            "title": "The Great Gatsby",
+            "author": "F. Scott Fitzgerald"
+        },
+        {
+            "title": "To Kill a Mockingbird",
+            "author": "Harper Lee"
+        },
+        {
+            "title": "1984",
+            "author": "George Orwell"
+        }
+    ]
+}
 
-{"name": "John", "age": 33, "children": [
-    {"name":"Meghan", "age": 12},
-    {"name" : "Charles", "age":6}
-]}
+`,
+    tabularData: `
+#token ROW_SEP -+[\\r\\n]*
+#token COLUMN_SEP \\|
+#token TEXT (?<value>[^#|]+?)\\s+(?=[|\\r\\n])
+
+#expr Table = ROW_SEP? (?<rows> TableRow) (ROW_SEP? (?<rows> TableRow))* ROW_SEP?
+
+#expr TableRow = COLUMN_SEP (?<cells>TEXT) (COLUMN_SEP (?<cells>TEXT))* COLUMN_SEP?
+
+#expr Text = (?<text>TEXT)
+
+-----------------------------------------------
+| Title                 | Author              |
+-----------------------------------------------
+| The Great Gatsby      | F. Scott Fitzgerald |
+-----------------------------------------------
+| To Kill a Mockingbird | Harper Lee          |
+-----------------------------------------------
+| 1984                  | George Orwell       |
+-----------------------------------------------
+
 `
 };
 
@@ -128,6 +184,7 @@ monaco.languages.onLanguage('sagebrush', () => {
 interface EditorProps {}
 
 interface EditorState {
+    showHelp: boolean;
     parser: {
         scanErrors: Parser['scanErrors'],
         result: null | Error | ReturnType<Parser['parse']>,
@@ -146,7 +203,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     constructor(props: EditorProps, state: EditorState) {
         super(props, state);
 
-        this.state ={
+        this.state = {
+            showHelp: false,
             parser: {
                 scanErrors: [],
                 result: null,
@@ -249,13 +307,89 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
     }
 
     render() {
+        const { showHelp } = this.state;
         return (
             <React.Fragment>
-                <div styleName="presets">
-                    choose preset
-                    <button onClick={() => this.setPresetValue('json')}>JSON</button>
-                    <button onClick={() => this.setPresetValue('names')}>Names</button>
-                </div>
+                {
+                    showHelp
+                    ? (
+                        <EuiOverlayMask>
+                            <EuiModal onClose={() => this.setState({showHelp: false})}>
+                                <EuiModalHeader>
+                                    <EuiModalHeaderTitle>Sagebrush</EuiModalHeaderTitle>
+                                </EuiModalHeader>
+                                <EuiModalBody>
+                                    <EuiText size="s">
+                                        At its core, the Sagebrush parser understands line comments <EuiCode>//</EuiCode> and
+                                        block comments <EuiCode>/* */</EuiCode>. It can further be entended with custom
+                                        tokens and expressions.
+                                    </EuiText>
+
+                                    <EuiSpacer size="l"/>
+
+                                    <EuiText size="s">
+                                        Tokens are added with <EuiCode>#token NAME regex</EuiCode>. The regular expressions are matched
+                                        by <EuiLink href="https://github.com/chandlerprall/sagebrush/tree/master/rex" target="_blank">@sagebrush/rex</EuiLink> and
+                                        can support any of its features.
+                                    </EuiText>
+
+                                    <EuiSpacer size="s"/>
+
+                                    <EuiCodeBlock>
+                                        // STRING matches anything enclosed by double quotes, including escape sequences<br/>
+                                        #token STRING "((?&lt;value&gt;[^\\"])|\\(?&lt;value&gt;.))+"
+                                    </EuiCodeBlock>
+
+                                    <EuiSpacer size="s"/>
+
+                                    <EuiText size="s">
+                                        Expressions have the form <EuiCode>#expr Name = regex</EuiCode>. These support a subset of regular
+                                        expressions for grouping and repetition operators, including non-greedy. Matches are against the
+                                        discovered tokens and can also include other expressions. Whitespace in these regular expressions
+                                        is ignored.
+                                    </EuiText>
+
+                                    <EuiSpacer size="s"/>
+
+                                    <EuiCodeBlock>
+                                        #token STRING ".*?"<br/>
+                                        #token NUMBER \d+<br/>
+                                        #token COLON :<br/>
+                                        #token IDENTIFIER [a-zA-Z]+<br/>
+                                        <br/>
+                                        #expr Value = (?&lt;value&gt;STRING|NUMBER)<br/>
+                                        <br/>
+                                        #expr Assignment = (?&lt;identifier&gt;IDENTIFIER) COLON (?&lt;value&gt;Value)<br/>
+                                        <br/>
+                                        value : 125
+                                    </EuiCodeBlock>
+                                </EuiModalBody>
+                                <EuiModalFooter>
+                                    <EuiButtonEmpty onClick={() => this.setState({showHelp: false})}>Dismiss</EuiButtonEmpty>
+                                </EuiModalFooter>
+                            </EuiModal>
+                        </EuiOverlayMask>
+                    ) : null
+                }
+                <EuiHeader>
+                    <EuiHeaderSection>
+                        <EuiHeaderSectionItem>
+                            <EuiHeaderSectionItemButton>
+                                <EuiIcon type="questionInCircle" size="l" onClick={() => this.setState({showHelp: true})}/>
+                            </EuiHeaderSectionItemButton>
+                        </EuiHeaderSectionItem>
+                    </EuiHeaderSection>
+                    <EuiHeaderSection>
+                        <EuiHeaderSectionItem>
+                            <EuiText size="s" styleName="presets">
+                                Choose Preset
+                                <EuiButtonEmpty onClick={() => this.setPresetValue('json')}>JSON</EuiButtonEmpty>
+                                <EuiButtonEmpty onClick={() => this.setPresetValue('tabularData')}>Tabular Data</EuiButtonEmpty>
+                                <EuiButtonEmpty onClick={() => this.setPresetValue('names')}>Names</EuiButtonEmpty>
+                            </EuiText>
+                        </EuiHeaderSectionItem>
+                    </EuiHeaderSection>
+                </EuiHeader>
                 <div className="fullsize" ref={this.mountEditor}/>
                 {this.state.parser.result != null
                 ? (
