@@ -1,7 +1,7 @@
 import {Token} from './Token';
 import {Location} from './Location';
 import {ScanError} from './ScanError';
-import ExpRex, {ExpressionMatch, MatchState, TokenMatch} from './exprex/ExpRex';
+import ExpRex, {ExpressionMatch, MatchState, TokenMap, TokenMatch} from './exprex/ExpRex';
 
 import Rex from '@sagebrush/rex';
 
@@ -12,7 +12,7 @@ export interface Expression {
     groups: Array<ExpRex>
 }
 
-interface PrettyResult {
+export interface PrettyResult {
     isCompleteMatch: boolean;
     expected: MatchState['result']['expected'];
     matchedTokens: number;
@@ -21,7 +21,7 @@ interface PrettyResult {
 
     [key: string]: any;
 }
-function prettyResult(result: { expression: Expression, match: MatchState['result'] }): PrettyResult {
+export function prettyResult(result: { expression: Expression, match: MatchState['result'] }): PrettyResult {
     const captures: {[key: string]: Array<any>} = {};
 
     const captureKeys = Object.keys(result.match.captures);
@@ -52,123 +52,67 @@ function prettyResult(result: { expression: Expression, match: MatchState['resul
 }
 
 export default class Parser {
-    private tokenDefinitions: Array<{name: string, test: Rex}> = [
-        { name: 'LineComment', test: new Rex('^//[^\\r\\n]*') },
-        { name: 'BlockComment', test: new Rex('^/\\*.*?\\*/') },
-        { name: 'TokenDefinition', test: new Rex('^#token\\s+(?<name>[A-Z_]+)\\s+(?<value>[^\\r\\n]+)') },
-        { name: 'ExpressionDefinition', test: new Rex('^#expr\\s+(?<name>[a-zA-Z_]+)\\s*=\\s*(?<subexpr>[^\\r\\n]+)') },
-    ];
-    public scanErrors: ScanError[] = [];
+    private tokenMap: TokenMap = new Map();
     public tokens: Token[] = [];
-    public expressions: Map<string, Expression> = new Map;
+    public expressionMap: Map<string, Expression> = new Map;
 
-    private cursor = {
-        index: 0,
-        line: 1,
-        column: 1
-    };
-
-    constructor(private source: string) {}
-
-    updateCursor(str: string) {
-        this.cursor.index += str.length;
-
-        for (let i = 0; i < str.length; i++) {
-            const char = str[i];
-
-            if (char === '\n') {
-                this.cursor.line++;
-                this.cursor.column = 1;
-            } else {
-                this.cursor.column++;
+    constructor(private source: string) {
+        source = source.replace(
+            /\/\/[^\r\n]*/gm,
+            () => {
+                return '';
             }
-        }
-    }
+        );
 
-    scan() {
-        while (this.cursor.index < this.source.length) {
-            // consume white space
-            let char = this.source[this.cursor.index];
-            if (whitespace.has(char)) {
-                this.updateCursor(char);
-            } else {
-                this.scanToken();
+        source = source.replace(
+            /\/\*(.*?)\*\//gm,
+            comment => {
+                return comment.replace(/[^\n]/g, '');
             }
-        }
-    }
+        );
 
-    private scanToken() {
-        let token: Token | undefined;
-        let bestTokenLength = -Infinity;
-
-        const locationStart = {line: this.cursor.line, column: this.cursor.column};
-        for (let i = 0; i < this.tokenDefinitions.length; i++) {
-            const tokenDefinition = this.tokenDefinitions[i];
-            const match = tokenDefinition.test.match(this.source, this.cursor.index);
-            if (match !== undefined) {
-                if (match.text.length > bestTokenLength) {
-                    bestTokenLength = match.text.length;
-                    token = new Token(
-                        tokenDefinition.name,
-                        match.text,
-                        match.captures,
-                        {
-                            start: locationStart,
-                            end: locationStart, // placeholder value, is overridden after the cursor is updated below
-                        }
-                    );
-                }
+        source = source.replace(
+            /^[\t ]*#token\s+([A-Z_]+)\s+(.+?)([\r\n]+)/gm,
+            (string, name, value, lineend) => {
+                this.tokenMap.set(name, new Rex('^' + value));
+                return lineend;
             }
-        }
+        );
 
-        if (token) {
-            this.updateCursor(token.lexeme);
+        source = source.replace(
+            /^[\t ]*#expr\s+([a-zA-Z_]+)\s*=\s*(.+?)([\r\n]+)/gm,
+            (string, name, subexpr, lineend) => {
+                const expression = new ExpRex(subexpr, this.tokenMap, this.expressionMap);
 
-            token.location.end = {line: this.cursor.line, column: this.cursor.column};
-
-            if (token.type === 'TokenDefinition') {
-                this.tokenDefinitions.push({
-                    name: token.values.name,
-                    test: new Rex('^' + token.values.value),
-                });
-            } else if (token.type === 'ExpressionDefinition') {
-                const {name, subexpr} = token.values;
-
-                let expression = this.expressions.get(name);
-                if (expression === undefined) {
-                    expression = {name, groups: []};
-                    this.expressions.set(name, expression);
+                if (this.expressionMap.has(name)) {
+                    this.expressionMap.get(name)!.groups.push(expression);
+                } else {
+                    this.expressionMap.set(name, {
+                        name,
+                        groups: [expression]
+                    });
                 }
 
-                expression.groups.push(new ExpRex(subexpr, this.expressions));
-            } else if (token.type === 'LineComment' || token.type === 'BlockComment') {
-                // don't track comments
-            } else {
-                this.tokens.push(token);
+                return lineend;
             }
-        } else {
-            const char = this.source[this.cursor.index];
-            this.scanErrors.push(new ScanError(
-                this.cursor.line,
-                this.cursor.column,
-                `Unexpected character "${char}"`
-            ));
-            this.updateCursor(char);
-        }
+        );
+
+        this.source = source;
     }
 
     parse(): ReturnType<typeof prettyResult> {
-        const expressionEntries = this.expressions.values();
+        const expressionEntries = this.expressionMap.values();
 
         let bestMatch: { expression: Expression, match: MatchState['result'] } | undefined = undefined;
 
         let entry = expressionEntries.next();
+
         while (!entry.done) {
             const expression = entry.value;
 
             for (let i = 0; i < expression.groups.length; i++) {
                 const group = expression.groups[i];
-                const match = group.match(this.tokens, 0);
+                const match = group.match(this.source, 0);
 
                 if (match !== undefined) {
                     if (bestMatch === undefined || match.tokens.length > bestMatch.match.tokens.length) {

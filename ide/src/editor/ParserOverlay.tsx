@@ -74,25 +74,12 @@ class ParserOverlayNode extends React.Component<ParserOverlayNodeProps, ParserOv
 }
 
 interface ParserOverlayProps {
-    scanErrors: Parser['scanErrors'],
     result: ReturnType<Parser['parse']>,
 }
 
-export default function ParserOverlay({ scanErrors, result }: ParserOverlayProps) {
+export default function ParserOverlay({ result }: ParserOverlayProps) {
     return (
         <EuiPanel styleName="overlay">
-            {
-                scanErrors.length > 0
-                    ? (
-                        <React.Fragment>
-                            <strong>scan errors</strong>
-                            <ul>
-                                {scanErrors.map((error, idx) => <li key={idx}>{error.toString()}</li>)}
-                            </ul>
-                        </React.Fragment>
-                    )
-                    : null
-            }
             {
                 result instanceof Error
                 ? result.toString()

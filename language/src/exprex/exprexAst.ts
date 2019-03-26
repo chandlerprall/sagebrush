@@ -31,7 +31,7 @@ export type MATCH_TYPE =
     typeof MATCH_TYPE_ZERO_OR_MORE |
     typeof MATCH_TYPE_ONE_OR_MORE;
 
-class ExpRexNode {
+export abstract class ExpRexNode {
     matchType: MATCH_TYPE = MATCH_TYPE_NORMAL;
     isNonGreedy: boolean = false;
 
@@ -44,8 +44,6 @@ class ExpRexNode {
     }
 }
 
-export class ExpRexMatchAny extends ExpRexNode {}
-
 export class ExpRexIdentifier extends ExpRexNode {
     constructor(public identifier: string) {
         super();
@@ -53,24 +51,18 @@ export class ExpRexIdentifier extends ExpRexNode {
 }
 
 export class ExpRexGroup extends ExpRexNode {
-    constructor(public members: ExpRexAstNode[], public captureNames: string[] = []) {
+    constructor(public members: ExpRexNode[], public captureNames: string[] = []) {
         super();
     }
 }
 
 export class ExpRexOr extends ExpRexNode {
-    constructor(public left: ExpRexAstNode[], public right: ExpRexAstNode[]) {
+    constructor(public left: ExpRexNode[], public right: ExpRexNode[]) {
         super();
     }
 }
 
-export type ExpRexAstNode =
-    ExpRexMatchAny |
-    ExpRexIdentifier |
-    ExpRexGroup |
-    ExpRexOr;
-
-export function parseExpRexAst(regex: string, captureGroups: string[] = []): ExpRexAstNode[] {
+export function parseExpRexAst(regex: string, captureGroups: string[] = []): ExpRexNode[] {
     if (regex.length === 0) throw new Error('Cannot parse empty regular expression');
     
     const members: ExpRexNode[] = [];
@@ -126,8 +118,6 @@ export function parseExpRexAst(regex: string, captureGroups: string[] = []): Exp
 
             if (char === ' ' || char === '\t') {
                 // ignore whitespace, it is an identifier separator
-            } else if (char === '.') {
-                member = new ExpRexMatchAny();
             } else if (char === '|') {
                 // upgrade this member to an OR group
                 // all members seen so far belong to the left side
@@ -137,7 +127,7 @@ export function parseExpRexAst(regex: string, captureGroups: string[] = []): Exp
                 const left = [...members];
 
                 // right side members are the rest of this regex
-                const right: ExpRexAstNode[] = parseExpRexAst(regex.slice(i + 1), captureGroups);
+                const right: ExpRexNode[] = parseExpRexAst(regex.slice(i + 1), captureGroups);
                 member = new ExpRexOr(left, right);
 
                 // we processed this whole regex, take control

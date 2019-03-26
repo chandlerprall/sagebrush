@@ -28,9 +28,9 @@ describe('Parser', () => {
 
 [{"name": "John", "age": 30}, true]
         `);
-            scanner.scan();
+            // scanner.scan();
             // scanner.tokens.forEach(token => console.log(token.toString()));
-            scanner.scanErrors.forEach(error => console.error(error.toString()));
+            // scanner.scanErrors.forEach(error => console.error(error.toString()));
             // scanner.expressions.forEach(expression => console.log(JSON.stringify(expression, null, 2)));
             const parseResult = scanner.parse();
             console.log(JSON.stringify(
@@ -59,9 +59,9 @@ describe('Parser', () => {
 
 1 + 3 * 2
         `);
-            scanner.scan();
+            // scanner.scan();
             // scanner.tokens.forEach(token => console.log(token.toString()));
-            scanner.scanErrors.forEach(error => console.error(error.toString()));
+            // scanner.scanErrors.forEach(error => console.error(error.toString()));
             // scanner.expressions.forEach(expression => console.log(JSON.stringify(expression, null, 2)));
             const parseResult = scanner.parse();
             console.log(
@@ -83,9 +83,9 @@ describe('Parser', () => {
 
 Michael, John,;
         `);
-            scanner.scan();
+            // scanner.scan();
             // scanner.tokens.forEach(token => console.log(token.toString()));
-            scanner.scanErrors.forEach(error => console.error(error.toString()));
+            // scanner.scanErrors.forEach(error => console.error(error.toString()));
             // scanner.expressions.forEach(expression => console.log(JSON.stringify(expression, null, 2)));
             const parseResult = scanner.parse();
             console.log(

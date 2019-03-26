@@ -26,15 +26,6 @@ import ParserOverlay from './ParserOverlay';
 import './Editor.scss';
 
 const presets = {
-    names: `
-#token SEMICOLON ;
-#token NAME (?<name>[a-zA-Z]+)
-#token COMMA ,
-
-#expr Names = (?<names>NAME) (COMMA (?<names>NAME))* SEMICOLON
-
-John, Francine, Meghan;
-`,
     json: `
 // JSON parser following the spec at https://www.json.org/
 
@@ -77,15 +68,15 @@ John, Francine, Meghan;
 
 `,
     tabularData: `
-#token ROW_SEP -+[\\r\\n]*
-#token COLUMN_SEP \\|
-#token TEXT (?<value>[^#|]+?)\\s+(?=[|\\r\\n])
+#token ROW_SEP -+
+#token CELL_SEP \\|
+#token CELL_SEP_FINAL \\|[\\r\\n]+
 
-#expr Table = ROW_SEP? (?<rows> TableRow) (ROW_SEP? (?<rows> TableRow))* ROW_SEP?
+#token CELL_TEXT (?<value>[^-]+?)(?=\\s*\\|)
 
-#expr TableRow = COLUMN_SEP (?<cells>TEXT) (COLUMN_SEP (?<cells>TEXT))* COLUMN_SEP?
+#expr Table = ROW_SEP ((?<rows>Row) ROW_SEP)+
 
-#expr Text = (?<text>TEXT)
+#expr Row = CELL_SEP (?<cells>CELL_TEXT) (CELL_SEP (?<cells>CELL_TEXT))* CELL_SEP_FINAL
 
 -----------------------------------------------
 | Title                 | Author              |
@@ -96,13 +87,12 @@ John, Francine, Meghan;
 -----------------------------------------------
 | 1984                  | George Orwell       |
 -----------------------------------------------
-
 `
 };
 
 monaco.languages.register({
     id: 'sagebrush',
-    extensions: ['.ss'],
+    extensions: ['.sb'],
     mimetypes: ['text/sagebrush'],
     aliases: ['sagebrush'],
 });
@@ -186,13 +176,31 @@ interface EditorProps {}
 interface EditorState {
     showHelp: boolean;
     parser: {
-        scanErrors: Parser['scanErrors'],
         result: null | Error | ReturnType<Parser['parse']>,
     }
 }
 
 function isError(x: any): x is Error {
     return x instanceof Error;
+}
+
+function reduceExpectations(expectations: Array<{ message: string, index: number }>) {
+    return expectations.reduce(
+        (expected, entry) => {
+            if (expected.length === 0) {
+                expected.push(entry);
+            } else {
+                if (entry.index > expected[0].index) {
+                    expected = [entry];
+                } else if (entry.index === expected[0].index) {
+                    expected.push(entry);
+                }
+            }
+
+            return expected;
+        },
+        [] as Array<{message: string, index: number}>
+    );
 }
 
 export default class Editor extends React.Component<EditorProps, EditorState> {
@@ -206,13 +214,13 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         this.state = {
             showHelp: false,
             parser: {
-                scanErrors: [],
                 result: null,
             }
         };
 
         this.parserStatusContentOverlay = document.createElement('div');
         this.parserStatusExpectedOverlay = document.createElement('div');
+        console.log(this.parserStatusExpectedOverlay);
     }
 
     componentDidMount() {
@@ -237,7 +245,6 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             const parser = new Parser(source);
             let result: Error | ReturnType<Parser['parse']>;
             try {
-                parser.scan();
                 result = parser.parse();
             } catch (e) {
                 result = e;
@@ -245,16 +252,28 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
             this.setState({
                 parser: {
-                    scanErrors: parser.scanErrors,
                     result,
                 }
             });
 
             if (!isError(result)) {
                 if (result.isCompleteMatch === false) {
-                    const expected = result.expected;
+                    const expected = reduceExpectations(result.expected);
 
-                    const lastValidToken = parser.tokens[Math.min(result.matchedTokens, parser.tokens.length) - 1];
+                    const source = this.editor.getValue();
+                    let lineNumber = 1;
+                    let column = 1;
+
+                    for (let i = 0; i < expected[0].index; i++) {
+                        const char = parser.source[i];
+
+                        if (char === '\n') {
+                            lineNumber++;
+                            column = 1;
+                        } else {
+                            column++;
+                        }
+                    }
 
                     this.editor.addContentWidget({
                         getId: () => 'expectedOverlay',
@@ -262,8 +281,8 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                         getPosition() {
                             return {
                                 position: {
-                                    column: lastValidToken.location.end.column,
-                                    lineNumber: lastValidToken.location.end.line,
+                                    column,
+                                    lineNumber,
                                 },
                                 preference: [1, 2, 0] // ABOVE, BELOW, EXACT
                             };
@@ -382,10 +401,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                     <EuiHeaderSection>
                         <EuiHeaderSectionItem>
                             <EuiText size="s" styleName="presets">
-                                Choose Preset
+                                Examples
                                 <EuiButtonEmpty onClick={() => this.setPresetValue('json')}>JSON</EuiButtonEmpty>
                                 <EuiButtonEmpty onClick={() => this.setPresetValue('tabularData')}>Tabular Data</EuiButtonEmpty>
-                                <EuiButtonEmpty onClick={() => this.setPresetValue('names')}>Names</EuiButtonEmpty>
                             </EuiText>
                         </EuiHeaderSectionItem>
                     </EuiHeaderSection>
@@ -403,7 +421,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                             !isError(this.state.parser.result)
                             ? createPortal(
                                 <div styleName="expectedOverlay">
-                                    {this.state.parser.result.type} expected {this.state.parser.result.expected.join(' or ')}
+                                    {this.state.parser.result.type} expected {reduceExpectations(this.state.parser.result.expected).map(({message}) => message).join(' or ')}
                                 </div>,
                                 this.parserStatusExpectedOverlay
                                 )

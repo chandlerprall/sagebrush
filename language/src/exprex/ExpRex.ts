@@ -1,8 +1,12 @@
+import Rex from '@sagebrush/rex';
 import * as ExpRexAst from './exprexAst';
 import { Token } from '../Token';
 import { Expression } from '../Parser';
+import {ExpRexNode} from './exprexAst';
+import {Index} from '../Location';
 
-type ExpressionMap = Map<string, Expression>;
+export type ExpressionMap = Map<string, Expression>;
+export type TokenMap = Map<string, Rex>;
 
 export interface TokenMatch {
     token: Token;
@@ -10,6 +14,7 @@ export interface TokenMatch {
 
 export interface ExpressionMatch {
     tokenLength: number;
+    textLength: number;
     expression: Expression;
     match: MatchState['result'];
 }
@@ -18,49 +23,53 @@ export type Match = TokenMatch | ExpressionMatch;
 
 export interface Matcher {
     consumes: boolean;
-    matches: (tokens: Token[], cursor: number) => Match[];
+    matches: (against: string, cursor: number) => Match[];
 }
 class EmptyMatcher implements Matcher {
     consumes = false;
 
-    matches(tokens: Token[], cursor: number) {
-        return [{ token: tokens[cursor] }];
-    }
-}
-
-class AnyMatcher implements Matcher {
-    consumes = true;
-
-    matches(tokens: Token[], cursor: number) {
-        const token = tokens[cursor];
-        return token !== undefined ? [{ token: token }] : [];
-    }
-
-    toString() {
-        return 'Any token';
+    matches() {
+        return [];
     }
 }
 
 export class IdentifierMatcher implements Matcher {
     consumes = true;
 
-    constructor(private identifier: string, private expressionMap: ExpressionMap) {}
+    constructor(private identifier: string, private tokenMap: TokenMap, private expressionMap: ExpressionMap) {}
 
-    matches(tokens: Token[], cursor: number) {
-        const token = tokens[cursor];
-        if (token == null) return [];
+    matches(against: string, cursor: number) {
+        if (against[cursor] == undefined) return [];
 
         const expression = this.expressionMap.get(this.identifier);
+
         if (expression === undefined) {
             // doesn't match any known expression, match against a token
-            return this.identifier === token.type ? [{ token }] : [];
+            const tokenTest = this.tokenMap.get(this.identifier);
+
+            if (tokenTest == undefined) return [];
+
+            const tokenMatch = tokenTest.match(against, cursor);
+            if (tokenMatch === undefined) return [];
+
+            return [{
+                token: new Token(
+                    this.identifier,
+                    tokenMatch.text,
+                    tokenMatch.captures,
+                    {
+                        start: { index: cursor },
+                        end: { index: cursor + tokenMatch.text.length }
+                    }
+                ),
+            }];
         } else {
             // match against the expression
             let bestMatch: MatchState['result'] | undefined;
 
             for (let i = 0; i < expression.groups.length; i++) {
                 const subexp = expression.groups[i];
-                const match = subexp.match(tokens, cursor);
+                const match = subexp.match(against, cursor);
 
                 if (match !== undefined) {
                     if (bestMatch === undefined || match.tokens.length > bestMatch.tokens.length) {
@@ -70,7 +79,15 @@ export class IdentifierMatcher implements Matcher {
             }
 
             return bestMatch
-                ? [{ expression, tokenLength: bestMatch.tokens.length, match: bestMatch }]
+                ? [{
+                    expression,
+                    tokenLength: bestMatch.tokens.length,
+                    textLength: bestMatch.tokens.reduce(
+                        (length, token) => length + token.lexeme.length,
+                        0
+                    ),
+                    match: bestMatch
+                }]
                 : [];
         }
     }
@@ -81,30 +98,13 @@ export class IdentifierMatcher implements Matcher {
     }
 }
 
-export class NegatedMatcher implements Matcher {
-    consumes = true;
-
-    constructor(private matcher: Matcher) {}
-
-    matches(tokens: Token[], cursor: number) {
-        const token = tokens[cursor];
-        if (token === undefined) return [];
-
-        return this.matcher.matches(tokens, cursor) ? [] : [{ token }];
-    }
-
-    toString() {
-        return `Not Match ${this.matcher.toString()}`;
-    }
-}
-
-class StateConnection {
+export class StateConnection {
     constructor(public matcher: Matcher, public node: StateNode) {}
 }
 
 let nextMatchCounterId = 0;
 let nextNodeId = 0;
-class StateNode {
+export class StateNode {
     public nodeId = nextNodeId++;
     public captureNames: Set<string> = new Set();
     public connections: StateConnection[] = [];
@@ -136,7 +136,7 @@ class StateNode {
     }
 }
 
-class EndStateNode extends StateNode {}
+export class EndStateNode extends StateNode {}
 
 const MATCH_STATUS_INITIALIZED = Symbol('MATCH_STATUS_INITIALIZED');
 const MATCH_STATUS_SUCCESS = Symbol('MATCH_STATUS_SUCCESS');
@@ -173,18 +173,24 @@ export class MatchState {
 
     constructor(
         private node: StateNode,
-        private against: Token[],
+        private against: string,
         private cursor: number,
         private cursorStart: number = cursor,
         public matchCounters: number[] = [],
         public captures: {[key: string]: Match[]} = {},
         private seenStates: Set<string> = new Set(),
-        private expected: string[] = []
+        private expected: Array<{message: string, index: number}> = [],
+        public tokens: Token[] = []
     ) {}
 
     advance() {
         if (this.status === MATCH_STATUS_FAIL) throw new Error('Cannot advance MatchState, already failed');
         if (this.status === MATCH_STATUS_SUCCESS) throw new Error('Cannot advance MatchState, already succeeded');
+
+        // update cursor to next non-whitespace character
+        while (whitespace.has(this.against[this.cursor])) {
+            this.cursor++;
+        }
 
         const myState = `${this.node.nodeId}-${this.cursor}-${this.matchCounters}`;
         if (this.seenStates.has(myState)) {
@@ -197,18 +203,27 @@ export class MatchState {
             const connection = this.node.connections[i];
 
             const matches = connection.matcher.matches(this.against, this.cursor);
-            const matchTokenLength = matches.reduce(
-                (length, match) => {
+
+            const matchTokens = matches.reduce(
+                (tokens, match) => {
                     if (match.hasOwnProperty('expression')) {
-                        return length + (match as ExpressionMatch).tokenLength;
+                        Array.prototype.push.apply(tokens, (match as ExpressionMatch).match.tokens);
                     } else {
-                        return length + 1;
+                        tokens.push((match as TokenMatch).token);
                     }
+                    return tokens;
                 },
-                0
+                [] as Token[]
             );
 
-            if (matchTokenLength > 0) {
+            const matchTokensLength = matchTokens.length;
+
+            let matchTextLength = 0;
+            if (matchTokensLength > 0) {
+                matchTextLength = (matchTokens[matchTokens.length-1].location.end as Index).index - (matchTokens[0].location.start as Index).index;
+            }
+
+            if (connection.matcher.consumes === false || matchTokensLength > 0) {
                 const isCompleteMatch = matches.reduce(
                     (isCompleteMatch, match) => {
                         if (isCompleteMatch === false) return isCompleteMatch;
@@ -252,12 +267,13 @@ export class MatchState {
                         this.nextStates.push(new MatchState(
                             connectedNode,
                             this.against,
-                            this.cursor + (connection.matcher.consumes ? matchTokenLength : 0),
+                            this.cursor + (connection.matcher.consumes ? matchTextLength : 0),
                             this.cursorStart,
                             matchCounters,
                             captures,
                             this.seenStates,
-                            [...this.expected]
+                            [...this.expected],
+                            [...this.tokens, ...matchTokens]
                         ));
                     }
                 }
@@ -285,8 +301,12 @@ export class MatchState {
         return this.nextStates;
     }
 
+    getMatchedText() {
+        return this.against.slice(this.cursorStart, this.cursor).trim();
+    }
+
     getMatchedTokens() {
-        return this.against.slice(this.cursorStart, this.cursor);
+        return this.tokens;
     }
 
     get isAtEndOfInputString() {
@@ -297,21 +317,26 @@ export class MatchState {
         if (this.status === MATCH_STATUS_INITIALIZED) {
             throw new Error('MatchState cannot yield a result until it has been advanced.');
         }
-        const expected = this.isAtEnd ? [] : this.node.connections.map(connection => connection.matcher.toString());
+        const expected = this.isAtEnd ? [] : this.node.connections.map(connection => ({
+            index: this.cursor,
+            message: connection.matcher.toString()
+        }));
 
         return {
             isCompleteMatch: this.isAtEnd,
-            // expected: this.isAtEnd ? [] : this.node.connections.map(connection => connection.matcher.toString()),
             expected: [...this.expected, ...expected],
+            text: this.getMatchedText(),
             tokens: this.getMatchedTokens(),
             captures: this.captures,
         };
     }
 }
 
-function assertNever(x: never): never {
+function assertNever(x: ExpRexNode | never): never {
     throw new Error('Runtime Type Error');
 }
+
+const whitespace = new Set([' ', '\t', '\r', '\n']);
 
 // all paths connect the same exit node so its safe to always choose the first unseen connection
 function collectExitNode(tree: StateNode): StateNode {
@@ -360,7 +385,7 @@ export default class ExpRex {
         }
     }
 
-    static buildFromMembers(members: ExpRexAst.ExpRexAstNode[], expressionMap: ExpressionMap, endNode = new EndStateNode()) {
+    static buildFromMembers(members: ExpRexAst.ExpRexNode[], tokenMap: TokenMap, expressionMap: ExpressionMap, endNode = new EndStateNode()) {
         const stateTree = new StateNode();
         let previousNodes: StateNode[] = [stateTree];
         let nextNodes: StateNode[];
@@ -369,19 +394,17 @@ export default class ExpRex {
             nextNodes = [];
             let matcher: Matcher;
 
-            const member: ExpRexAst.ExpRexAstNode = members[i];
+            const member: ExpRexAst.ExpRexNode = members[i];
 
             // in most cases entry and exit are the same node
             let entryNode = new StateNode();
             let exitNode = entryNode;
 
             if (member instanceof ExpRexAst.ExpRexIdentifier) {
-                matcher = new IdentifierMatcher(member.identifier, expressionMap);
-            } else if (member instanceof ExpRexAst.ExpRexMatchAny) {
-                matcher = new AnyMatcher();
+                matcher = new IdentifierMatcher(member.identifier, tokenMap, expressionMap);
             } else if (member instanceof ExpRexAst.ExpRexGroup) {
                 matcher = new EmptyMatcher();
-                const groupTree = ExpRex.buildFromMembers(member.members, expressionMap, new StateNode());
+                const groupTree = ExpRex.buildFromMembers(member.members, tokenMap, expressionMap, new StateNode());
                 groupTree.addCaptureNames(member.captureNames);
                 // entryNode is the group entry
                 entryNode = groupTree;
@@ -399,8 +422,8 @@ export default class ExpRex {
                 // validate this or node doesn't have special matching
                 // as that should be very impossible
                 if (matchType !== ExpRexAst.MATCH_TYPE_NORMAL) throw new Error('RexOr node must be a MATCH_TYPE_NORMAL');
-                const leftTree = ExpRex.buildFromMembers(member.left, expressionMap, new StateNode());
-                const rightTree = ExpRex.buildFromMembers(member.right, expressionMap, new StateNode());
+                const leftTree = ExpRex.buildFromMembers(member.left, tokenMap, expressionMap, new StateNode());
+                const rightTree = ExpRex.buildFromMembers(member.right, tokenMap, expressionMap, new StateNode());
 
                 previousNodes.forEach(prev => {
                     prev.connect(matcher, leftTree);
@@ -469,24 +492,24 @@ export default class ExpRex {
         return stateTree;
     }
 
-    static buildFromSequence(sequence: string, expressionMap: ExpressionMap) {
+    static buildFromSequence(sequence: string, tokenMap: TokenMap, expressionMap: ExpressionMap) {
         if (sequence.length === 0) throw new Error('Cannot create sequence from zero-length token array');
         const members = ExpRexAst.parseExpRexAst(sequence);
-        return ExpRex.buildFromMembers(members, expressionMap);
+        return ExpRex.buildFromMembers(members, tokenMap, expressionMap);
     }
 
-    constructor(regex: string, private expressionMap: ExpressionMap) {
+    constructor(regex: string, private tokenMap: TokenMap, private expressionMap: ExpressionMap) {
         if (regex.length === 0) throw new Error('Cannot create regex from zero-length token array');
 
-        this.stateTree = ExpRex.buildFromSequence(regex, this.expressionMap);
+        this.stateTree = ExpRex.buildFromSequence(regex, tokenMap, this.expressionMap);
         ExpRex.compressMatchers(this.stateTree);
     }
 
-    match(against: Token[], cursor = 0) {
+    match(against: string, cursor = 0) {
         return this.matchAt(against, cursor);
     }
 
-    private matchAt(against: Token[], cursor: number) {
+    private matchAt(against: string, cursor: number) {
         const states: MatchState[] = [new MatchState(this.stateTree, against, cursor)];
         let bestMatchLength = -Infinity;
         let bestMatch: MatchState | undefined;
@@ -496,7 +519,7 @@ export default class ExpRex {
 
             state.advance();
 
-            const match = state.getMatchedTokens();
+            const match = state.getMatchedText();
             const isLengthBetter = bestMatch === undefined ? true :
                 match.length > bestMatchLength && isNewCountersBetter(bestMatch.matchCounters, state.matchCounters);
             const isNewBestMatch =

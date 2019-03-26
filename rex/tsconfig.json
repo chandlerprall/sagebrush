@@ -9,7 +9,8 @@
     "declaration": true,
     "declarationDir": "types",
     "lib": ["es2015"],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "types": []
   },
   "include": ["src/**/*"],
   "exclude": ["src/**/*.test.ts"]

@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "dev": "webpack-dev-server -c webpack.config.js"
+    "dev": "webpack-dev-server -c webpack.config.js",
+		"build": "PRODUCTION=true webpack -c webpack.config.js"
   },
   "jest": {
     "rootDir": ".",
