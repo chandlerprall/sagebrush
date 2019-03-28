@@ -185,7 +185,7 @@ function isError(x: any): x is Error {
     return x instanceof Error;
 }
 
-function reduceExpectations(expectations: Array<{ message: string, index: number }>) {
+function reduceExpectations(expectations: Array<{ expectant: string, message: string, index: number }>) {
     return expectations.reduce(
         (expected, entry) => {
             if (expected.length === 0) {
@@ -200,7 +200,7 @@ function reduceExpectations(expectations: Array<{ message: string, index: number
 
             return expected;
         },
-        [] as Array<{message: string, index: number}>
+        [] as Array<{ expectant: string, message: string, index: number}>
     );
 }
 
@@ -246,6 +246,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             let result: Error | ReturnType<Parser['parse']>;
             try {
                 result = parser.parse();
+                window.source=  parser.source;
             } catch (e) {
                 result = e;
             }
@@ -265,7 +266,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                     let column = 1;
 
                     for (let i = 0; i < expected[0].index; i++) {
-                        const char = parser.source[i];
+                        const char = source[i];
 
                         if (char === '\n') {
                             lineNumber++;
@@ -433,7 +434,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                             !isError(this.state.parser.result)
                             ? createPortal(
                                 <div styleName="expectedOverlay">
-                                    {this.state.parser.result.type} expected {reduceExpectations(this.state.parser.result.expected).map(({message}) => message).join(' or ')}
+                                    {reduceExpectations(this.state.parser.result.expected).map(({ expectant, message }) => `${expectant} expected ${message}`).join(', ')}
                                 </div>,
                                 this.parserStatusExpectedOverlay
                                 )

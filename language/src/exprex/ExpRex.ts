@@ -69,7 +69,7 @@ export class IdentifierMatcher implements Matcher {
 
             for (let i = 0; i < expression.groups.length; i++) {
                 const subexp = expression.groups[i];
-                const match = subexp.match(against, cursor);
+                const match = subexp.match(against, cursor, this.toString());
 
                 if (match !== undefined) {
                     if (bestMatch === undefined || match.isCompleteMatch && !bestMatch.isCompleteMatch || match.tokens.length > bestMatch.tokens.length) {
@@ -173,6 +173,7 @@ export class MatchState {
     public nextStates: MatchState[] = [];
 
     constructor(
+        private expectant: string,
         private node: StateNode,
         private against: string,
         private cursor: number,
@@ -180,7 +181,7 @@ export class MatchState {
         public matchCounters: number[] = [],
         public captures: {[key: string]: Match[]} = {},
         private seenStates: Set<string> = new Set(),
-        public expected: Array<{message: string, index: number}> = [],
+        public expected: Array<{ expectant: string, message: string, index: number}> = [],
         public tokens: Token[] = []
     ) {}
 
@@ -242,9 +243,9 @@ export class MatchState {
                     matches.forEach(match => {
                         if (match.hasOwnProperty('expression')) {
                             match = match as ExpressionMatch;
-                            // debugger;
+                            debugger;
                             Array.prototype.push.apply(this.expected, match.match.expected.map(
-                                ({ message, index }) => ({ message, index: index - this.adjustedWhitespaceChars })
+                                ({ expectant, message, index }) => ({ expectant, message, index: index - this.adjustedWhitespaceChars })
                             ));
                         }
                     });
@@ -270,6 +271,7 @@ export class MatchState {
                         }
 
                         this.nextStates.push(new MatchState(
+                            this.expectant,
                             connectedNode,
                             this.against,
                             this.cursor + (connection.matcher.consumes ? matchTextLength : 0),
@@ -287,7 +289,7 @@ export class MatchState {
                     if (match.hasOwnProperty('expression')) {
                         match = match as ExpressionMatch;
                         Array.prototype.push.apply(this.expected, match.match.expected.map(
-                            ({ message, index }) => ({ message, index: index - 0 })
+                            ({ expectant, message, index }) => ({ expectant, message, index: index - 0 })
                         ));
                     }
                 });
@@ -334,6 +336,7 @@ export class MatchState {
         const expected = this.isAtEnd ? [] : this.node.connections
             .filter(connection => connection.matcher instanceof EmptyMatcher === false)
             .map(connection => ({
+                expectant: this.expectant,
                 index: this.cursor - this.adjustedWhitespaceChars,
                 message: connection.matcher.toString()
             }));
@@ -521,12 +524,12 @@ export default class ExpRex {
         ExpRex.compressMatchers(this.stateTree);
     }
 
-    match(against: string, cursor = 0) {
-        return this.matchAt(against, cursor);
+    match(against: string, cursor = 0, expectant: string) {
+        return this.matchAt(against, cursor, expectant);
     }
 
-    private matchAt(against: string, cursor: number) {
-        const states: MatchState[] = [new MatchState(this.stateTree, against, cursor)];
+    private matchAt(against: string, cursor: number, expectant: string) {
+        const states: MatchState[] = [new MatchState(expectant, this.stateTree, against, cursor)];
         let bestMatchLength = -Infinity;
         let bestMatch: MatchState | undefined;
 

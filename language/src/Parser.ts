@@ -57,32 +57,30 @@ export default class Parser {
     public expressionMap: Map<string, Expression> = new Map;
 
     constructor(private source: string) {
-        source = source.replace(
-            /\/\/[^\r\n]*/gm,
-            () => {
-                return '';
-            }
-        );
-
-        source = source.replace(
-            /\/\*(.*?)\*\//gm,
-            comment => {
-                return comment.replace(/[^\n]/g, '');
+        this.tokenMap.set('LINE_COMMENT', new Rex('^//(?<comment>[^\r\n]+)'));
+        this.tokenMap.set('BLOCK_COMMENT', new Rex('^/\\*(?<comment>.*?)\\*/'));
+        this.expressionMap.set(
+            'Comment',
+            {
+                name: 'Comment',
+                groups: [
+                    new ExpRex('(?<comment>LINE_COMMENT | BLOCK_COMMENT)', this.tokenMap, this.expressionMap),
+                ],
             }
         );
 
         source = source.replace(
             /^[\t ]*#token\s+([A-Z_]+)\s+(.+?)([\r\n]+)/gm,
-            (string, name, value, lineend) => {
+            (match, name, value, lineend) => {
                 this.tokenMap.set(name, new Rex('^' + value));
-                return lineend;
+                return match.replace(/[^\r\n]/g, ' ');
             }
         );
 
         source = source.replace(
             /^[\t ]*#expr\s+([a-zA-Z_]+)\s*=\s*(.+?)([\r\n]+)/gm,
-            (string, name, subexpr, lineend) => {
-                const expression = new ExpRex(subexpr, this.tokenMap, this.expressionMap);
+            (match, name, subexpr, lineend) => {
+                const expression = new ExpRex(`(?<comments>Comment)* ${subexpr}`, this.tokenMap, this.expressionMap);
 
                 if (this.expressionMap.has(name)) {
                     this.expressionMap.get(name)!.groups.push(expression);
@@ -93,7 +91,7 @@ export default class Parser {
                     });
                 }
 
-                return lineend;
+                return match.replace(/[^\r\n]/g, ' ');
             }
         );
 
@@ -112,7 +110,7 @@ export default class Parser {
 
             for (let i = 0; i < expression.groups.length; i++) {
                 const group = expression.groups[i];
-                const match = group.match(this.source, 0);
+                const match = group.match(this.source, 0, expression.name);
 
                 if (match !== undefined) {
                     if (bestMatch === undefined || match.tokens.length > bestMatch.match.tokens.length) {
