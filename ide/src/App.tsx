@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import 'normalize.css';
-import '@elastic/eui/dist/eui_theme_light.css';
+import './eui_theme_light.css';
 import './globals.css';
 import Editor from './editor/Editor';
 

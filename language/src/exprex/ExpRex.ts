@@ -72,7 +72,7 @@ export class IdentifierMatcher implements Matcher {
                 const match = subexp.match(against, cursor);
 
                 if (match !== undefined) {
-                    if (bestMatch === undefined || match.tokens.length > bestMatch.tokens.length) {
+                    if (bestMatch === undefined || match.isCompleteMatch && !bestMatch.isCompleteMatch || match.tokens.length > bestMatch.tokens.length) {
                         bestMatch = match;
                     }
                 }
@@ -169,6 +169,7 @@ function isNewCountersBetter(oldCounters: number[], newCounters: number[]) {
 
 export class MatchState {
     private status: MATCH_STATUS = MATCH_STATUS_INITIALIZED;
+    private adjustedWhitespaceChars = 0;
     public nextStates: MatchState[] = [];
 
     constructor(
@@ -179,7 +180,7 @@ export class MatchState {
         public matchCounters: number[] = [],
         public captures: {[key: string]: Match[]} = {},
         private seenStates: Set<string> = new Set(),
-        private expected: Array<{message: string, index: number}> = [],
+        public expected: Array<{message: string, index: number}> = [],
         public tokens: Token[] = []
     ) {}
 
@@ -189,6 +190,7 @@ export class MatchState {
 
         // update cursor to next non-whitespace character
         while (whitespace.has(this.against[this.cursor])) {
+            this.adjustedWhitespaceChars++;
             this.cursor++;
         }
 
@@ -240,7 +242,10 @@ export class MatchState {
                     matches.forEach(match => {
                         if (match.hasOwnProperty('expression')) {
                             match = match as ExpressionMatch;
-                            Array.prototype.push.apply(this.expected, match.match.expected);
+                            // debugger;
+                            Array.prototype.push.apply(this.expected, match.match.expected.map(
+                                ({ message, index }) => ({ message, index: index - this.adjustedWhitespaceChars })
+                            ));
                         }
                     });
                 } else {
@@ -277,6 +282,15 @@ export class MatchState {
                         ));
                     }
                 }
+            } else {
+                matches.forEach(match => {
+                    if (match.hasOwnProperty('expression')) {
+                        match = match as ExpressionMatch;
+                        Array.prototype.push.apply(this.expected, match.match.expected.map(
+                            ({ message, index }) => ({ message, index: index - 0 })
+                        ));
+                    }
+                });
             }
         }
 
@@ -317,10 +331,12 @@ export class MatchState {
         if (this.status === MATCH_STATUS_INITIALIZED) {
             throw new Error('MatchState cannot yield a result until it has been advanced.');
         }
-        const expected = this.isAtEnd ? [] : this.node.connections.map(connection => ({
-            index: this.cursor,
-            message: connection.matcher.toString()
-        }));
+        const expected = this.isAtEnd ? [] : this.node.connections
+            .filter(connection => connection.matcher instanceof EmptyMatcher === false)
+            .map(connection => ({
+                index: this.cursor - this.adjustedWhitespaceChars,
+                message: connection.matcher.toString()
+            }));
 
         return {
             isCompleteMatch: this.isAtEnd,
@@ -527,7 +543,12 @@ export default class ExpRex {
                 || (state.isAtEnd && !bestMatch.isAtEnd) // previous best wasn't a successful match, this one is
                 || isLengthBetter // new match better fits
             ;
+
             if (isNewBestMatch) {
+                if (bestMatch !== undefined && bestMatchLength > match.length) {
+                    // inherit all of the expectations
+                    Array.prototype.push.apply(state.expected, bestMatch.result.expected);
+                }
                 bestMatch = state;
                 bestMatchLength = match.length;
             }

@@ -6,6 +6,7 @@ import {
     EuiCode,
     EuiCodeBlock,
     EuiHeader,
+    EuiHeaderBreadcrumbs,
     EuiHeaderSection,
     EuiHeaderSectionItem,
     EuiHeaderSectionItemButton,
@@ -220,7 +221,6 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
         this.parserStatusContentOverlay = document.createElement('div');
         this.parserStatusExpectedOverlay = document.createElement('div');
-        console.log(this.parserStatusExpectedOverlay);
     }
 
     componentDidMount() {
@@ -257,7 +257,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             });
 
             if (!isError(result)) {
-                if (result.isCompleteMatch === false) {
+                if (result.expected.length > 0) {
                     const expected = reduceExpectations(result.expected);
 
                     const source = this.editor.getValue();
@@ -404,6 +404,18 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                                 Examples
                                 <EuiButtonEmpty onClick={() => this.setPresetValue('json')}>JSON</EuiButtonEmpty>
                                 <EuiButtonEmpty onClick={() => this.setPresetValue('tabularData')}>Tabular Data</EuiButtonEmpty>
+                            </EuiText>
+                        </EuiHeaderSectionItem>
+                    </EuiHeaderSection>
+                    <EuiHeaderBreadcrumbs breadcrumbs={[]} />
+                    <EuiHeaderSection side="right">
+                        <EuiHeaderSectionItem>
+                            <EuiText size="s" styleName="gh">
+                                <EuiLink href="https://github.com/chandlerprall/sagebrush" target="_blank">
+                                    <EuiIcon type="logoGithub" size="m"/>
+                                    &nbsp;
+                                    https://github.com/chandlerprall/sagebrush
+                                </EuiLink>
                             </EuiText>
                         </EuiHeaderSectionItem>
                     </EuiHeaderSection>

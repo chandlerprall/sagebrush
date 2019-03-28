@@ -89,14 +89,18 @@ module.exports = {
 	},
 
 	plugins: [
-		new MonacoWebpackPlugin()
+		new MonacoWebpackPlugin({
+			languages: []
+		}),
+		new HtmlWebpackPlugin({
+			title: 'Sagebrush IDE'
+		}),
 	],
 };
 
 if (isProduction === false) {
 	module.exports.plugins.push(
 		new webpack.HotModuleReplacementPlugin(),
-		new HtmlWebpackPlugin(),
 	);
 
 	module.exports.devServer = {

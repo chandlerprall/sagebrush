@@ -47,8 +47,8 @@ class ParserOverlayNode extends React.Component<ParserOverlayNodeProps, ParserOv
             )
         } else if (typeof node === 'object') {
             const keys = Object.keys(node).filter(key => {
-                if (key === 'isCompleteMatch') return false;
-                if (key === 'expected') return false;
+                // if (key === 'isCompleteMatch') return false;
+                // if (key === 'expected') return false;
                 if (key === 'matchedTokens') return false;
                 return true;
             });

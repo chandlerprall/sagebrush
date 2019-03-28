@@ -75,13 +75,35 @@ describe('Parser', () => {
 
         it('reports expectations at incomplete syntax', () => {
             const scanner = new Parser(`
-#token SEMICOLON ;
-#token WORD [a-zA-Z]+
+// JSON parser following the spec at https://www.json.org/
+
+#token NUMBER (?<value>-?(\\d|[1-9]\\d+)(\\.\\d+)?([eE](+|-)?\\d+)?)
+#token STRING "(?<value>([^\\\\"]|\\\\(["\\\\/bfnrt]|u\\d\\d\\d\\d))*)"
+#token BOOLEAN (?<value>true|false)
+#token NULL null
+
+#token LEFT_PAREN \\[
+#token RIGHT_PAREN \\]
 #token COMMA ,
 
-#expr Words = (?<words>WORD) (COMMA (?<words>WORD))* SEMICOLON
+#token LEFT_BRACE {
+#token RIGHT_BRACE }
+#token COLON :
 
-Michael, John,;
+#expr Array = LEFT_PAREN ( (?<values>Value) ( COMMA (?<values>Value) )* )? RIGHT_PAREN
+
+#expr Object = LEFT_BRACE ( (?<assignments>ObjectAssignment) ( COMMA (?<assignments>ObjectAssignment) )* )? RIGHT_BRACE
+#expr ObjectAssignment = (?<key>STRING) COLON (?<value>Value)
+
+#expr Value = (?<value>Object|Array|NUMBER|STRING|BOOLEAN|NULL)
+
+{
+    "books": [
+        5,
+    ]
+}
+
+
         `);
             // scanner.scan();
             // scanner.tokens.forEach(token => console.log(token.toString()));

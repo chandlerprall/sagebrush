@@ -241,7 +241,7 @@ Object {
   "captures": Object {},
   "expected": Array [
     Object {
-      "index": 4,
+      "index": 3,
       "message": "BAR token",
     },
   ],
@@ -985,7 +985,7 @@ Object {
   "captures": Object {},
   "expected": Array [
     Object {
-      "index": 4,
+      "index": 3,
       "message": "BAR token",
     },
   ],
@@ -1241,7 +1241,7 @@ Object {
   "captures": Object {},
   "expected": Array [
     Object {
-      "index": 4,
+      "index": 3,
       "message": "Fizz expression",
     },
   ],
@@ -2001,7 +2001,7 @@ Object {
   "captures": Object {},
   "expected": Array [
     Object {
-      "index": 4,
+      "index": 3,
       "message": "BAR token",
     },
   ],
