@@ -43,10 +43,12 @@ export function prettyResult(result: { expression: Expression, match: MatchState
         expected: result.match.expected,
         matchedTokens: result.match.tokens.length,
         type: result.expression.name,
-        location: {
-            start: result.match.tokens[0].location!.start,
-            end: result.match.tokens[result.match.tokens.length - 1].location!.end,
-        },
+        location: result.match.tokens.length > 0
+            ? {
+                start: result.match.tokens[0].location!.start,
+                end: result.match.tokens[result.match.tokens.length - 1].location!.end,
+            }
+            : { start: { index: 0 }, end: { index: 0 } },
         ...captures
     };
 }
@@ -99,27 +101,19 @@ export default class Parser {
     }
 
     parse(): ReturnType<typeof prettyResult> {
-        const expressionEntries = this.expressionMap.values();
-
         let bestMatch: { expression: Expression, match: MatchState['result'] } | undefined = undefined;
 
-        let entry = expressionEntries.next();
+        const expression = this.expressionMap.get('Program')!;
 
-        while (!entry.done) {
-            const expression = entry.value;
+        for (let i = 0; i < expression.groups.length; i++) {
+            const group = expression.groups[i];
+            const match = group.match(this.source, expression.name);
 
-            for (let i = 0; i < expression.groups.length; i++) {
-                const group = expression.groups[i];
-                const match = group.match(this.source, 0, expression.name);
-
-                if (match !== undefined) {
-                    if (bestMatch === undefined || match.tokens.length > bestMatch.match.tokens.length) {
-                        bestMatch = { expression, match };
-                    }
+            if (match !== undefined) {
+                if (bestMatch === undefined || match.tokens.length > bestMatch.match.tokens.length) {
+                    bestMatch = { expression, match };
                 }
             }
-
-            entry = expressionEntries.next();
         }
 
         if (bestMatch) return prettyResult(bestMatch);

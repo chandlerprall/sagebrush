@@ -14,7 +14,7 @@ describe("ExpRex", () => {
 
     const exprex = new ExpRex("FOO", tokenMap, expressionMap);
 
-    expect(exprex.match("FOO")).toMatchInlineSnapshot(`
+    expect(exprex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -38,7 +38,7 @@ Object {
 }
 `);
 
-    expect(exprex.match("FOOFOO")).toMatchInlineSnapshot(`
+    expect(exprex.match("FOOFOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -62,7 +62,7 @@ Object {
 }
 `);
 
-    expect(exprex.match("FOO FOO")).toMatchInlineSnapshot(`
+    expect(exprex.match("FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -86,7 +86,7 @@ Object {
 }
 `);
 
-    expect(exprex.match("FOOBAR")).toMatchInlineSnapshot(`
+    expect(exprex.match("FOOBAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -110,7 +110,7 @@ Object {
 }
 `);
 
-    expect(exprex.match("FOO BAR")).toMatchInlineSnapshot(`
+    expect(exprex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -134,11 +134,12 @@ Object {
 }
 `);
 
-    expect(exprex.match("")).toMatchInlineSnapshot(`
+    expect(exprex.match("", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -149,11 +150,12 @@ Object {
 }
 `);
 
-    expect(exprex.match("BAR")).toMatchInlineSnapshot(`
+    expect(exprex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -170,7 +172,7 @@ Object {
 
     const exprex = new ExpRex("FOO BAR", tokenMap, expressionMap);
 
-    expect(exprex.match("FOO BAR")).toMatchInlineSnapshot(`
+    expect(exprex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -207,11 +209,12 @@ Object {
 }
 `);
 
-    expect(exprex.match("FOO")).toMatchInlineSnapshot(`
+    expect(exprex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -236,11 +239,12 @@ Object {
 }
 `);
 
-    expect(exprex.match("FOO FOO")).toMatchInlineSnapshot(`
+    expect(exprex.match("FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -265,11 +269,12 @@ Object {
 }
 `);
 
-    expect(exprex.match("")).toMatchInlineSnapshot(`
+    expect(exprex.match("", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -280,11 +285,12 @@ Object {
 }
 `);
 
-    expect(exprex.match("BAR")).toMatchInlineSnapshot(`
+    expect(exprex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -305,7 +311,7 @@ Object {
 
     const exprex = new ExpRex("Fizz", tokenMap, expressionMap);
 
-    expect(exprex.match("FOO BAR")).toMatchInlineSnapshot(`
+    expect(exprex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -347,11 +353,12 @@ Object {
     it("matches a repeated character at the end", () => {
       const rex = new ExpRex("FOO BAR*", tokenMap, new Map());
 
-      expect(rex.match("")).toMatchInlineSnapshot(`
+      expect(rex.match("", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -361,11 +368,12 @@ Object {
   "tokens": Array [],
 }
 `);
-      expect(rex.match("BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -376,7 +384,7 @@ Object {
 }
 `);
 
-      expect(rex.match("FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -399,7 +407,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -435,7 +443,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("FOO BAR BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO BAR BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -489,15 +497,17 @@ Object {
     it("matches a repeated character in the middle", () => {
       const rex = new ExpRex("FOO* BAR", tokenMap, new Map());
 
-      expect(rex.match("")).toMatchInlineSnapshot(`
+      expect(rex.match("", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "BAR token",
     },
@@ -507,15 +517,17 @@ Object {
   "tokens": Array [],
 }
 `);
-      expect(rex.match("FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "FOO token",
     },
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -540,7 +552,7 @@ Object {
 }
 `);
 
-      expect(rex.match("BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -563,7 +575,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -599,7 +611,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("FOO FOO BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -655,11 +667,12 @@ Object {
     it("matches a repeated character", () => {
       const rex = new ExpRex("FOO+", tokenMap, new Map());
 
-      expect(rex.match("")).toMatchInlineSnapshot(`
+      expect(rex.match("", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -670,7 +683,7 @@ Object {
 }
 `);
 
-      expect(rex.match("FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -693,7 +706,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("FOO FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -734,15 +747,17 @@ Object {
     it("matches a repeated character in the middle", () => {
       const rex = new ExpRex("FOO+ BAR", tokenMap, new Map());
 
-      expect(rex.match("FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "FOO token",
     },
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -767,7 +782,7 @@ Object {
 }
 `);
 
-      expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -803,7 +818,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("FOO FOO BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -859,7 +874,7 @@ Object {
     it("matches a repeated character", () => {
       const rex = new ExpRex("FOO?", tokenMap, new Map());
 
-      expect(rex.match("")).toMatchInlineSnapshot(`
+      expect(rex.match("", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -868,7 +883,7 @@ Object {
   "tokens": Array [],
 }
 `);
-      expect(rex.match("FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -896,15 +911,17 @@ Object {
     it("matches a repeated character in the middle", () => {
       const rex = new ExpRex("FOO? BAR", tokenMap, new Map());
 
-      expect(rex.match("")).toMatchInlineSnapshot(`
+      expect(rex.match("", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "BAR token",
     },
@@ -915,11 +932,12 @@ Object {
 }
 `);
 
-      expect(rex.match("FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -943,7 +961,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -980,11 +998,12 @@ Object {
 }
 `);
 
-      expect(rex.match("FOO FOO BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -1024,7 +1043,7 @@ Object {
         });
 
         const rex = new ExpRex("FOO Fizz*? BAR", tokenMap, expressionMap);
-        expect(rex.match("FOO FOO BAR BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO BAR BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1087,7 +1106,7 @@ Object {
 
         const rex = new ExpRex("Fizz*? FOO FOO", tokenMap, expressionMap);
 
-        expect(rex.match("FOO FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1123,7 +1142,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("BAR FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1172,7 +1191,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("BAR FOO FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR FOO FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1236,11 +1255,12 @@ Object {
         });
 
         const rex = new ExpRex("FOO Fizz+? FOO", tokenMap, expressionMap);
-        expect(rex.match("FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "Fizz expression",
     },
@@ -1264,7 +1284,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1313,7 +1333,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1362,7 +1382,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO FOO FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1425,11 +1445,12 @@ Object {
 
         const rex = new ExpRex("Fizz+? FOO FOO", tokenMap, expressionMap);
 
-        expect(rex.match("FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "Fizz expression",
     },
@@ -1439,7 +1460,7 @@ Object {
   "tokens": Array [],
 }
 `);
-        expect(rex.match("FOO FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1488,7 +1509,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO FOO FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1537,7 +1558,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("BAR FOO FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR FOO FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1590,7 +1611,7 @@ Object {
 
       it("tracks two non-greedy one-or-more matchers", () => {
         const rex = new ExpRex("FOO+? BAR+?", tokenMap, new Map());
-        expect(rex.match("FOO FOO FOO BAR BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO FOO BAR BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1656,7 +1677,7 @@ Object {
 
       it("works alongside greedy matchers", () => {
         const rex = new ExpRex("FOO+? BAR+", tokenMap, new Map());
-        expect(rex.match("FOO FOO FOO BAR BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO FOO BAR BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1740,11 +1761,12 @@ Object {
       it("matches a standalone group", () => {
         const rex = new ExpRex("(FOO BAR+)", tokenMap, new Map());
 
-        expect(rex.match("FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -1768,7 +1790,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1804,7 +1826,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1858,11 +1880,12 @@ Object {
       it("matches a group at the beginning", () => {
         const rex = new ExpRex("(FOO) BAR", tokenMap, new Map());
 
-        expect(rex.match("FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -1886,7 +1909,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1927,11 +1950,12 @@ Object {
       it("matches a group at the end", () => {
         const rex = new ExpRex("FOO (BAR)", tokenMap, new Map());
 
-        expect(rex.match("FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -1955,7 +1979,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -1996,11 +2020,12 @@ Object {
       it("matches a group in the middle", () => {
         const rex = new ExpRex("FOO (BAR) FOO", tokenMap, new Map());
 
-        expect(rex.match("FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -2024,11 +2049,12 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 7,
       "message": "FOO token",
     },
@@ -2065,11 +2091,12 @@ Object {
   ],
 }
 `);
-        expect(rex.match("BAR FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -2079,7 +2106,7 @@ Object {
   "tokens": Array [],
 }
 `);
-        expect(rex.match("FOO BAR FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2135,15 +2162,17 @@ Object {
       it("matches zero or more groups in the beginning", () => {
         const rex = new ExpRex("(FOO)* BAR", tokenMap, new Map());
 
-        expect(rex.match("FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "FOO token",
     },
@@ -2167,7 +2196,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2190,7 +2219,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2226,7 +2255,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2280,11 +2309,12 @@ Object {
       it("matches zero or more groups at the end", () => {
         const rex = new ExpRex("FOO (BAR)*", tokenMap, new Map());
 
-        expect(rex.match("BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -2294,7 +2324,7 @@ Object {
   "tokens": Array [],
 }
 `);
-        expect(rex.match("FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2317,7 +2347,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2353,7 +2383,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2402,7 +2432,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR BAR FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2456,15 +2486,17 @@ Object {
       it("matches zero or more groups in the middle", () => {
         const rex = new ExpRex("FOO (BAR)* FOO", tokenMap, new Map());
 
-        expect(rex.match("FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "FOO token",
     },
@@ -2488,11 +2520,12 @@ Object {
   ],
 }
 `);
-        expect(rex.match("BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -2502,15 +2535,17 @@ Object {
   "tokens": Array [],
 }
 `);
-        expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 7,
       "message": "FOO token",
     },
     Object {
+      "expectant": "test",
       "index": 7,
       "message": "BAR token",
     },
@@ -2547,11 +2582,12 @@ Object {
   ],
 }
 `);
-        expect(rex.match("BAR FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -2562,7 +2598,7 @@ Object {
 }
 `);
 
-        expect(rex.match("FOO FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2598,7 +2634,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2654,15 +2690,17 @@ Object {
       it("matches one or more groups in the beginning", () => {
         const rex = new ExpRex("(FOO)+ BAR", tokenMap, new Map());
 
-        expect(rex.match("FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "FOO token",
     },
@@ -2686,11 +2724,12 @@ Object {
   ],
 }
 `);
-        expect(rex.match("BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -2701,7 +2740,7 @@ Object {
 }
 `);
 
-        expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2737,7 +2776,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2786,7 +2825,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2827,11 +2866,12 @@ Object {
       it("matches one or more groups at the end", () => {
         const rex = new ExpRex("FOO (BAR)+", tokenMap, new Map());
 
-        expect(rex.match("BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -2841,11 +2881,12 @@ Object {
   "tokens": Array [],
 }
 `);
-        expect(rex.match("FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -2870,7 +2911,7 @@ Object {
 }
 `);
 
-        expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2906,7 +2947,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -2955,7 +2996,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR BAR BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR BAR BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3017,7 +3058,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR BAR BAR FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR BAR BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3084,11 +3125,12 @@ Object {
       it("matches one or more groups in the middle", () => {
         const rex = new ExpRex("FOO (BAR)+ FOO", tokenMap, new Map());
 
-        expect(rex.match("FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 3,
       "message": "BAR token",
     },
@@ -3112,11 +3154,12 @@ Object {
   ],
 }
 `);
-        expect(rex.match("BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -3126,15 +3169,17 @@ Object {
   "tokens": Array [],
 }
 `);
-        expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 7,
       "message": "FOO token",
     },
     Object {
+      "expectant": "test",
       "index": 7,
       "message": "BAR token",
     },
@@ -3171,11 +3216,12 @@ Object {
   ],
 }
 `);
-        expect(rex.match("BAR FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
@@ -3186,7 +3232,7 @@ Object {
 }
 `);
 
-        expect(rex.match("FOO BAR FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3235,7 +3281,7 @@ Object {
   ],
 }
 `);
-        expect(rex.match("FOO BAR BAR FOO")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3320,7 +3366,7 @@ Object {
       it("records the matched tokens in a named group", () => {
         const rex = new ExpRex("FOO (?<bar>BAR)+", tokenMap, new Map());
 
-        expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+        expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {
     "bar": Array [
@@ -3388,7 +3434,7 @@ Object {
 
         const rex = new ExpRex("FOO (?<fizz>Fizz)+", tokenMap, expressionMap);
 
-        expect(rex.match("FOO BAR FOO")).toMatchSnapshot();
+        expect(rex.match("FOO BAR FOO", "test")).toMatchSnapshot();
       });
 
       it("records nested matched expressions in a named group", () => {
@@ -3407,7 +3453,7 @@ Object {
         });
 
         const rex = new ExpRex("FOO (?<buzz>Buzz)+", tokenMap, expressionMap);
-        expect(rex.match("FOO BAR FOO")).toMatchSnapshot();
+        expect(rex.match("FOO BAR FOO", "test")).toMatchSnapshot();
       });
     });
   });
@@ -3415,15 +3461,17 @@ Object {
   describe("ORs", () => {
     it("matches a OR b", () => {
       const rex = new ExpRex("FOO|BAR", tokenMap, new Map());
-      expect(rex.match("")).toMatchInlineSnapshot(`
+      expect(rex.match("", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "FOO token",
     },
     Object {
+      "expectant": "test",
       "index": 0,
       "message": "BAR token",
     },
@@ -3433,7 +3481,7 @@ Object {
   "tokens": Array [],
 }
 `);
-      expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3456,7 +3504,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3479,7 +3527,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("BAR FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3506,7 +3554,7 @@ Object {
 
     it("matches foo OR bar OR buzz", () => {
       const rex = new ExpRex("FOO|BAR|BUZZ", tokenMap, new Map());
-      expect(rex.match("FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3529,7 +3577,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3552,7 +3600,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("BUZZ")).toMatchInlineSnapshot(`
+      expect(rex.match("BUZZ", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3576,7 +3624,7 @@ Object {
 }
 `);
 
-      expect(rex.match("FOO BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3599,7 +3647,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("FOO BUZZ")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO BUZZ", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3622,7 +3670,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("BUZZ FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("BUZZ FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3651,7 +3699,7 @@ Object {
   describe("match beginning", () => {
     it("binds the matcher to the start of the input", () => {
       const rex = new ExpRex("(FOO|BAR)BUZZ", tokenMap, new Map());
-      expect(rex.match("FOO BUZZ")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO BUZZ", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3687,7 +3735,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("BAR BUZZ")).toMatchInlineSnapshot(`
+      expect(rex.match("BAR BUZZ", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3729,7 +3777,7 @@ Object {
   describe("complex", () => {
     it("matches a nested group", () => {
       const rex = new ExpRex("((FOO|BUZZ)|BAR)|FIZZ", tokenMap, new Map());
-      expect(rex.match("FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3752,7 +3800,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("BUZZ")).toMatchInlineSnapshot(`
+      expect(rex.match("BUZZ", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3775,7 +3823,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("BAR")).toMatchInlineSnapshot(`
+      expect(rex.match("BAR", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3798,7 +3846,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("FIZZ FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("FIZZ FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3821,7 +3869,7 @@ Object {
   ],
 }
 `);
-      expect(rex.match("BAR FOO")).toMatchInlineSnapshot(`
+      expect(rex.match("BAR FOO", "test")).toMatchInlineSnapshot(`
 Object {
   "captures": Object {},
   "expected": Array [],
@@ -3854,7 +3902,7 @@ Object {
     it("(FOO+)+", () => {
       expect(
         timeMe(() => {
-          new ExpRex("(FOO+)+", tokenMap, new Map()).match(input);
+          new ExpRex("(FOO+)+", tokenMap, new Map()).match(input, "test");
         })
       ).toBeLessThan(10);
     });
@@ -3862,7 +3910,7 @@ Object {
     it("([FOO]+)*", () => {
       expect(
         timeMe(() => {
-          new ExpRex("(FOO+)*", tokenMap, new Map()).match(input);
+          new ExpRex("(FOO+)*", tokenMap, new Map()).match(input, "test");
         })
       ).toBeLessThan(10);
     });
@@ -3870,7 +3918,10 @@ Object {
     it("(FOO|FOO FOO)+", () => {
       expect(
         timeMe(() => {
-          new ExpRex("(FOO|FOO FOO)+", tokenMap, new Map()).match(input);
+          new ExpRex("(FOO|FOO FOO)+", tokenMap, new Map()).match(
+            input,
+            "test"
+          );
         })
       ).toBeLessThan(10);
     });

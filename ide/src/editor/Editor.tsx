@@ -5,10 +5,15 @@ import {
     EuiButtonEmpty,
     EuiCode,
     EuiCodeBlock,
+    // @ts-ignore
     EuiHeader,
+    // @ts-ignore
     EuiHeaderBreadcrumbs,
+    // @ts-ignore
     EuiHeaderSection,
+    // @ts-ignore
     EuiHeaderSectionItem,
+    // @ts-ignore
     EuiHeaderSectionItemButton,
     EuiIcon,
     EuiLink,
@@ -18,7 +23,6 @@ import {
     EuiModalBody,
     EuiModalFooter,
     EuiOverlayMask,
-    EuiPanel,
     EuiSpacer,
     EuiText
 } from '@elastic/eui';
@@ -43,6 +47,8 @@ const presets = {
 #token RIGHT_BRACE }
 #token COLON :
 
+#expr Program = (?<json>Array | Object)
+
 #expr Array = LEFT_PAREN ( (?<values>Value) ( COMMA (?<values>Value) )* )? RIGHT_PAREN
 
 #expr Object = LEFT_BRACE ( (?<assignments>ObjectAssignment) ( COMMA (?<assignments>ObjectAssignment) )* )? RIGHT_BRACE
@@ -66,7 +72,6 @@ const presets = {
         }
     ]
 }
-
 `,
     tabularData: `
 #token ROW_SEP -+
@@ -75,7 +80,7 @@ const presets = {
 
 #token CELL_TEXT (?<value>[^-]+?)(?=\\s*\\|)
 
-#expr Table = ROW_SEP ((?<rows>Row) ROW_SEP)+
+#expr Program = ROW_SEP ((?<rows>Row) ROW_SEP)+
 
 #expr Row = CELL_SEP (?<cells>CELL_TEXT) (CELL_SEP (?<cells>CELL_TEXT))* CELL_SEP_FINAL
 
@@ -246,9 +251,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             let result: Error | ReturnType<Parser['parse']>;
             try {
                 result = parser.parse();
-                window.source=  parser.source;
             } catch (e) {
                 result = e;
+                console.error(e);
             }
 
             this.setState({
@@ -258,7 +263,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             });
 
             if (!isError(result)) {
-                if (result.expected.length > 0) {
+                if (result.isCompleteMatch === false) {
                     const expected = reduceExpectations(result.expected);
 
                     const source = this.editor.getValue();

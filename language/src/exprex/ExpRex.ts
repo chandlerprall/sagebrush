@@ -69,7 +69,7 @@ export class IdentifierMatcher implements Matcher {
 
             for (let i = 0; i < expression.groups.length; i++) {
                 const subexp = expression.groups[i];
-                const match = subexp.match(against, cursor, this.toString());
+                const match = subexp.match(against, this.toString(), cursor);
 
                 if (match !== undefined) {
                     if (bestMatch === undefined || match.isCompleteMatch && !bestMatch.isCompleteMatch || match.tokens.length > bestMatch.tokens.length) {
@@ -167,6 +167,25 @@ function isNewCountersBetter(oldCounters: number[], newCounters: number[]) {
     return true;
 }
 
+function cloneCaptures(captures: MatchState['captures']): MatchState['captures'] {
+    const clonedCaptures: MatchState['captures'] = {};
+    const keys = Object.keys(captures);
+
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const values = captures[key];
+        const clonedValues = [];
+
+        for (let j = 0; j < values.length; j++) {
+            clonedValues.push(values[j]);
+        }
+
+        clonedCaptures[key] = clonedValues;
+    }
+
+    return clonedCaptures;
+}
+
 export class MatchState {
     private status: MATCH_STATUS = MATCH_STATUS_INITIALIZED;
     private adjustedWhitespaceChars = 0;
@@ -189,12 +208,6 @@ export class MatchState {
         if (this.status === MATCH_STATUS_FAIL) throw new Error('Cannot advance MatchState, already failed');
         if (this.status === MATCH_STATUS_SUCCESS) throw new Error('Cannot advance MatchState, already succeeded');
 
-        // update cursor to next non-whitespace character
-        while (whitespace.has(this.against[this.cursor])) {
-            this.adjustedWhitespaceChars++;
-            this.cursor++;
-        }
-
         const myState = `${this.node.nodeId}-${this.cursor}-${this.matchCounters}`;
         if (this.seenStates.has(myState)) {
             this.status = MATCH_STATUS_FAIL;
@@ -202,10 +215,17 @@ export class MatchState {
         }
         this.seenStates.add(myState);
 
+        // update cursor to next non-whitespace character
+        let adjustedCursor = this.cursor;
+        while (whitespace.has(this.against[adjustedCursor])) {
+            this.adjustedWhitespaceChars++;
+            adjustedCursor++;
+        }
+
         for (let i = 0; i < this.node.connections.length; i++) {
             const connection = this.node.connections[i];
 
-            const matches = connection.matcher.matches(this.against, this.cursor);
+            const matches = connection.matcher.matches(this.against, adjustedCursor);
 
             const matchTokens = matches.reduce(
                 (tokens, match) => {
@@ -243,7 +263,6 @@ export class MatchState {
                     matches.forEach(match => {
                         if (match.hasOwnProperty('expression')) {
                             match = match as ExpressionMatch;
-                            debugger;
                             Array.prototype.push.apply(this.expected, match.match.expected.map(
                                 ({ expectant, message, index }) => ({ expectant, message, index: index - this.adjustedWhitespaceChars })
                             ));
@@ -262,7 +281,7 @@ export class MatchState {
 
                         // append character to any active capture groups
                         const applyCaptures = connection.matcher.consumes && connectedNode.captureNames.size > 0;
-                        const captures = applyCaptures ? {...this.captures} : this.captures; // only clone if being modified
+                        const captures = applyCaptures ? cloneCaptures(this.captures) : this.captures; // only clone if being modified
                         if (applyCaptures) {
                             connectedNode.captureNames.forEach(name => {
                                 if (captures.hasOwnProperty(name) === false) captures[name] = [];
@@ -274,7 +293,7 @@ export class MatchState {
                             this.expectant,
                             connectedNode,
                             this.against,
-                            this.cursor + (connection.matcher.consumes ? matchTextLength : 0),
+                            this.cursor + (connection.matcher.consumes ? this.adjustedWhitespaceChars + matchTextLength : 0),
                             this.cursorStart,
                             matchCounters,
                             captures,
@@ -318,7 +337,7 @@ export class MatchState {
     }
 
     getMatchedText() {
-        return this.against.slice(this.cursorStart, this.cursor).trim();
+        return this.against.slice(this.cursorStart, this.cursor);
     }
 
     getMatchedTokens() {
@@ -337,7 +356,7 @@ export class MatchState {
             .filter(connection => connection.matcher instanceof EmptyMatcher === false)
             .map(connection => ({
                 expectant: this.expectant,
-                index: this.cursor - this.adjustedWhitespaceChars,
+                index: this.cursor,
                 message: connection.matcher.toString()
             }));
 
@@ -524,7 +543,7 @@ export default class ExpRex {
         ExpRex.compressMatchers(this.stateTree);
     }
 
-    match(against: string, cursor = 0, expectant: string) {
+    match(against: string, expectant: string, cursor = 0) {
         return this.matchAt(against, cursor, expectant);
     }
 

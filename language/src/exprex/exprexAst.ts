@@ -63,7 +63,7 @@ export class ExpRexOr extends ExpRexNode {
 }
 
 export function parseExpRexAst(regex: string, captureGroups: string[] = []): ExpRexNode[] {
-    if (regex.length === 0) throw new Error('Cannot parse empty regular expression');
+    if (regex.trim().length === 0) throw new Error('Cannot parse empty regular expression');
     
     const members: ExpRexNode[] = [];
 

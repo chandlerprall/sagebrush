@@ -11,7 +11,7 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "jsx": "Preserve",
-    "types": ["./typings/react"]
+    "types": ["./typings/react", "@types/jest"]
   },
   "include": ["src/**/*"],
   "exclude": ["src/**/*.test.ts"]
