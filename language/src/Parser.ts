@@ -1,11 +1,8 @@
 import {Token} from './Token';
-import {Location} from './Location';
-import {ScanError} from './ScanError';
-import ExpRex, {ExpressionMatch, MatchState, TokenMap, TokenMatch} from './exprex/ExpRex';
+import {Location, Index} from './Location';
+import ExpRex, {ExpressionMatch, Match, MatchState, TokenMap, TokenMatch} from './exprex/ExpRex';
 
 import Rex from '@sagebrush/rex';
-
-const whitespace = new Set([' ', '\t', '\r', '\n']);
 
 export interface Expression {
     name: string,
@@ -21,21 +18,51 @@ export interface PrettyResult {
 
     [key: string]: any;
 }
-export function prettyResult(result: { expression: Expression, match: MatchState['result'] }): PrettyResult {
+
+function prettyCaptures(input: MatchState['result']['captures']) {
     const captures: {[key: string]: Array<any>} = {};
 
-    const captureKeys = Object.keys(result.match.captures);
+    const captureKeys = Object.keys(input);
     for (let i = 0; i < captureKeys.length; i++) {
         const key = captureKeys[i];
-        const values = result.match.captures[key];
+        const values = input[key];
 
         captures[key] = values.map(value => {
             if (value.hasOwnProperty('expression')) {
                 return prettyResult((value as ExpressionMatch));
             } else {
-                return (value as TokenMatch).token;
+                const tokenCaptures: {[key: string]: string} = {};
+                const { values, type, lexeme, location } = (value as TokenMatch).token;
+
+                const valueNames = Object.keys(values);
+                for (let i = 0; i < valueNames.length; i++) {
+                    const valueName = valueNames[i];
+                    tokenCaptures[valueName] = values[valueName];
+                }
+
+                return {
+                    type,
+                    lexeme,
+                    location,
+                    ...tokenCaptures
+                };
             }
         });
+    }
+
+    return captures;
+}
+
+export function prettyResult(result: { expression: Expression, match: MatchState['result'] }): PrettyResult {
+    if (result.match.promotedMatch.length > 0) {
+        const promotedMatch = result.match.promotedMatch[0];
+        if (promotedMatch.hasOwnProperty('expression')) {
+            return prettyResult(promotedMatch as ExpressionMatch);
+        } else {
+            return prettyCaptures({
+                token: [promotedMatch as TokenMatch]
+            }).token[0];
+        }
     }
 
     return {
@@ -43,14 +70,78 @@ export function prettyResult(result: { expression: Expression, match: MatchState
         expected: result.match.expected,
         matchedTokens: result.match.tokens.length,
         type: result.expression.name,
-        location: result.match.tokens.length > 0
-            ? {
-                start: result.match.tokens[0].location!.start,
-                end: result.match.tokens[result.match.tokens.length - 1].location!.end,
-            }
-            : { start: { index: 0 }, end: { index: 0 } },
-        ...captures
+        // @ts-ignore-next-line
+        location: result.match.location ? result.match.location : { start: { index: 0 }, end: { index: 0 } },
+        ...prettyCaptures(result.match.captures)
     };
+}
+
+function locate<T extends { expression: Expression, match: MatchState['result'] }>(result: T, source: string): T {
+    function findLocations(match: MatchState['result'], locations: { index: number }[] = []) {
+        if (match.tokens.length === 0) return locations;
+
+        const start = { index: (match.tokens[0].location.start as Index).index };
+        const end = { index: (match.tokens[match.tokens.length - 1].location.end as Index).index };
+
+        // @ts-ignore-next-line
+        match.location = { start, end };
+        locations.push(start);
+
+        const captureKeys = Object.keys(match.captures);
+
+        for (let i = 0; i < captureKeys.length; i++) {
+            const captureKey = captureKeys[i];
+            const captures = match.captures[captureKey];
+
+            for (let j = 0; j < captures.length; j++) {
+                const match = captures[j];
+
+                if (match.hasOwnProperty('expression')) {
+                    findLocations((match as ExpressionMatch).match, locations);
+                } else {
+                    locations.push((match as TokenMatch).token.location.start as Index);
+                    locations.push((match as TokenMatch).token.location.end as Index);
+                }
+            }
+        }
+
+        locations.push(end);
+
+
+        return locations;
+    }
+
+    let cursor = 0;
+    let line = 1;
+    let column = 1;
+
+    const locations = findLocations(result.match, [...result.match.expected]);
+    locations.sort((a, b) => {
+        if (a.index < b.index) return -1;
+        if (a.index > b.index) return 1;
+        return 0;
+    });
+
+    while (locations.length > 0) {
+        const location = locations.shift() as Index;
+
+        while (cursor < location.index) {
+            const char = source[cursor++];
+
+            if (char === '\n') {
+                line++;
+                column = 1;
+            } else {
+                column++;
+            }
+        }
+
+        // @ts-ignore-next-line
+        location.line = line;
+        // @ts-ignore-next-line
+        location.column = column;
+    }
+    return result;
 }
 
 export default class Parser {
@@ -116,7 +207,7 @@ export default class Parser {
             }
         }
 
-        if (bestMatch) return prettyResult(bestMatch);
+        if (bestMatch) return prettyResult(locate(bestMatch, this.source));
 
         throw new Error(`Could not parse input: no matching expression`);
     }

@@ -51,7 +51,7 @@ export class ExpRexIdentifier extends ExpRexNode {
 }
 
 export class ExpRexGroup extends ExpRexNode {
-    constructor(public members: ExpRexNode[], public captureNames: string[] = []) {
+    constructor(public members: ExpRexNode[], public captureNames: CaptureGroup[] = []) {
         super();
     }
 }
@@ -62,7 +62,11 @@ export class ExpRexOr extends ExpRexNode {
     }
 }
 
-export function parseExpRexAst(regex: string, captureGroups: string[] = []): ExpRexNode[] {
+export class CaptureGroup {
+    constructor(public name: string, public isCapturePromoted: boolean) {}
+}
+
+export function parseExpRexAst(regex: string, captureGroups: CaptureGroup[] = []): ExpRexNode[] {
     if (regex.trim().length === 0) throw new Error('Cannot parse empty regular expression');
     
     const members: ExpRexNode[] = [];
@@ -140,6 +144,7 @@ export function parseExpRexAst(regex: string, captureGroups: string[] = []): Exp
                 let captureName: string | undefined = undefined;
                 let groupSequence = '';
                 let validSequence = false;
+                let isCapturePromoted = false;
 
                 const peek = regex[i + 1];
                 if (peek === '?') {
@@ -147,6 +152,12 @@ export function parseExpRexAst(regex: string, captureGroups: string[] = []): Exp
                     if (regex[i + 2] !== '<') throw new Error('Invalid capture group name');
 
                     i += 3;
+
+                    if (regex[i] === '@') {
+                        isCapturePromoted = true;
+                        i++;
+                    }
+
                     // scan until end of name
                     for (i; i < regex.length; i++) {
                         const char = regex[i];
@@ -186,7 +197,7 @@ export function parseExpRexAst(regex: string, captureGroups: string[] = []): Exp
 
                 const cgroups = [...captureGroups];
                 if (captureName !== undefined) {
-                    cgroups.push(captureName);
+                    cgroups.push(new CaptureGroup(captureName, isCapturePromoted));
                 }
                 member = new ExpRexGroup(parseExpRexAst(groupSequence, cgroups), cgroups);
             } else if (char === ')') {

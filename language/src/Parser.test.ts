@@ -4,29 +4,15 @@ describe('Parser', () => {
     describe('parsing', () => {
         it('parses a thing', () => {
             const scanner = new Parser(`
-// JSON
-#token LEFT_BRACE {
-#token RIGHT_BRACE }
-#token LEFT_BRACKET \\[
-#token RIGHT_BRACKET \\]
-#token COLON :
-#token COMMA ,
+#token FOO FOO
 
-#expr JsonArray = LEFT_BRACKET ((?<values>JsonValue) (COMMA (?<values>JsonValue))*)? RIGHT_BRACKET
-#expr JsonObject = LEFT_BRACE ((?<values>JsonObjectAssignment) (COMMA (?<values>JsonObjectAssignment))*)? RIGHT_BRACE
+#expr Foo = (?<@foo>FOO)
 
-#expr JsonObjectAssignment = (?<key>STRING_LITERAL) COLON (?<value>JsonValue)
+#expr Fizz = (?<@fizz>Foo)
 
-#expr JsonValue = (?<value>JsonLiteral | JsonArray | JsonObject)
+#expr Program = (?<program>Fizz)
 
-// Literals
-#token NUMERIC_LITERAL (?<raw>-?\\d+(\\.\\d+)?)
-#token BOOLEAN_LITERAL (?<raw>true|false)
-#token STRING_LITERAL "(?<raw>([^\\\\]|\\\\.)*?)"
-
-#expr Program = (?<value>NUMERIC_LITERAL | BOOLEAN_LITERAL | STRING_LITERAL)
-
-[{"name": "John", "age": 30}, true]
+FOO
         `);
             // scanner.scan();
             // scanner.tokens.forEach(token => console.log(token.toString()));

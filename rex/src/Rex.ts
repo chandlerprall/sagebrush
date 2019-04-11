@@ -120,6 +120,14 @@ export class WordMatcher implements Matcher {
     }
 }
 
+export class EndMatcher implements Matcher {
+    consumes = false;
+
+    matches(char?: string) {
+        return char === undefined;
+    }
+}
+
 export class NegatedMatcher implements Matcher {
     consumes = true;
 
@@ -349,7 +357,6 @@ function collectExitNode(tree: StateNode): StateNode {
 
 export default class Rex {
     private isBoundToStart: boolean;
-    private isBoundToEnd: boolean;
     private stateTree: StateNode;
 
     static compressMatchers(tree: StateNode, seenNodes = new Set()) {
@@ -395,6 +402,8 @@ export default class Rex {
                 matcher = new CharMatcher(member.char);
             } else if (member instanceof RexAst.RexMatchAny) {
                 matcher = new AnyMatcher();
+            } else if (member instanceof RexAst.RexEnd) {
+                matcher = new EndMatcher();
             } else if (member instanceof RexAst.RexWhitespace) {
                 matcher = new WhitespaceMatcher();
             } else if (member instanceof RexAst.RexNotWhitespace) {
@@ -518,11 +527,6 @@ export default class Rex {
             regex = regex.slice(1);
         }
 
-        this.isBoundToEnd = regex[regex.length - 1] === '$';
-        if (this.isBoundToEnd) {
-            regex = regex.slice(0, regex.length - 1);
-        }
-
         this.stateTree = Rex.buildFromSequence(regex);
         Rex.compressMatchers(this.stateTree);
     }
@@ -550,14 +554,12 @@ export default class Rex {
             if (state.isAtEnd) {
                 const match = state.getMatchedText();
                 if (bestMatch === undefined || state.totalConsumedLength >= bestMatchLength) {
-                    if (!this.isBoundToEnd || state.isAtEndOfInputString) {
-                        if (bestMatch === undefined) {
-                            bestMatch = state;
-                            bestMatchLength = state.totalConsumedLength;
-                        } else if (isNewCountersBetter(bestMatch.matchCounters, state.matchCounters)) {
-                            bestMatch = state;
-                            bestMatchLength = state.totalConsumedLength;
-                        }
+                    if (bestMatch === undefined) {
+                        bestMatch = state;
+                        bestMatchLength = state.totalConsumedLength;
+                    } else if (isNewCountersBetter(bestMatch.matchCounters, state.matchCounters)) {
+                        bestMatch = state;
+                        bestMatchLength = state.totalConsumedLength;
                     }
                 }
             } else if (state.isSuccessful) {

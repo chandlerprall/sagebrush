@@ -19,6 +19,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -43,6 +44,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -67,6 +69,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -91,6 +94,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -115,6 +119,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -145,6 +150,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -161,6 +167,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -177,6 +184,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -220,6 +228,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -250,6 +259,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -280,6 +290,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -296,6 +307,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -316,6 +328,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -364,6 +377,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -379,6 +393,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -389,6 +404,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -412,6 +428,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -448,6 +465,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR BAR",
   "tokens": Array [
     Token {
@@ -513,6 +531,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -533,6 +552,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -557,6 +577,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BAR",
   "tokens": Array [
     Token {
@@ -580,6 +601,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -616,6 +638,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO BAR",
   "tokens": Array [
     Token {
@@ -678,6 +701,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -688,6 +712,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -711,6 +736,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO",
   "tokens": Array [
     Token {
@@ -763,6 +789,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -787,6 +814,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -823,6 +851,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO BAR",
   "tokens": Array [
     Token {
@@ -879,6 +908,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -888,6 +918,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -927,6 +958,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -943,6 +975,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -966,6 +999,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -1009,6 +1043,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -1048,6 +1083,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO BAR",
   "tokens": Array [
     Token {
@@ -1111,6 +1147,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO",
   "tokens": Array [
     Token {
@@ -1147,6 +1184,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BAR FOO FOO",
   "tokens": Array [
     Token {
@@ -1196,6 +1234,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BAR FOO FOO",
   "tokens": Array [
     Token {
@@ -1266,6 +1305,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -1289,6 +1329,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR FOO",
   "tokens": Array [
     Token {
@@ -1338,6 +1379,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO FOO",
   "tokens": Array [
     Token {
@@ -1387,6 +1429,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO FOO",
   "tokens": Array [
     Token {
@@ -1456,6 +1499,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -1465,6 +1509,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO FOO",
   "tokens": Array [
     Token {
@@ -1514,6 +1559,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO FOO",
   "tokens": Array [
     Token {
@@ -1563,6 +1609,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BAR FOO FOO",
   "tokens": Array [
     Token {
@@ -1616,6 +1663,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO FOO BAR",
   "tokens": Array [
     Token {
@@ -1682,6 +1730,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO FOO BAR BAR",
   "tokens": Array [
     Token {
@@ -1772,6 +1821,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -1795,6 +1845,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -1831,6 +1882,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR BAR",
   "tokens": Array [
     Token {
@@ -1891,6 +1943,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -1914,6 +1967,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -1961,6 +2015,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -1984,6 +2039,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -2031,6 +2087,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -2060,6 +2117,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -2102,6 +2160,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -2111,6 +2170,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR FOO",
   "tokens": Array [
     Token {
@@ -2178,6 +2238,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -2201,6 +2262,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BAR",
   "tokens": Array [
     Token {
@@ -2224,6 +2286,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -2260,6 +2323,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO BAR",
   "tokens": Array [
     Token {
@@ -2320,6 +2384,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -2329,6 +2394,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -2352,6 +2418,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -2388,6 +2455,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR BAR",
   "tokens": Array [
     Token {
@@ -2437,6 +2505,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR BAR",
   "tokens": Array [
     Token {
@@ -2502,6 +2571,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -2531,6 +2601,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -2551,6 +2622,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -2593,6 +2665,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -2603,6 +2676,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO",
   "tokens": Array [
     Token {
@@ -2639,6 +2713,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR FOO",
   "tokens": Array [
     Token {
@@ -2706,6 +2781,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -2735,6 +2811,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -2745,6 +2822,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -2781,6 +2859,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO FOO BAR",
   "tokens": Array [
     Token {
@@ -2830,6 +2909,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -2877,6 +2957,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -2892,6 +2973,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -2916,6 +2998,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -2952,6 +3035,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR BAR",
   "tokens": Array [
     Token {
@@ -3001,6 +3085,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR BAR BAR",
   "tokens": Array [
     Token {
@@ -3063,6 +3148,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR BAR BAR",
   "tokens": Array [
     Token {
@@ -3136,6 +3222,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -3165,6 +3252,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -3185,6 +3273,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -3227,6 +3316,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -3237,6 +3327,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR FOO",
   "tokens": Array [
     Token {
@@ -3286,6 +3377,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR BAR FOO",
   "tokens": Array [
     Token {
@@ -3389,6 +3481,7 @@ Object {
   },
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BAR",
   "tokens": Array [
     Token {
@@ -3455,6 +3548,23 @@ Object {
         const rex = new ExpRex("FOO (?<buzz>Buzz)+", tokenMap, expressionMap);
         expect(rex.match("FOO BAR FOO", "test")).toMatchSnapshot();
       });
+
+      it("promotes marked expressions", () => {
+        const expressionMap: Map<string, Expression> = new Map();
+        expressionMap.set("Fizz", {
+          name: "Fizz",
+          groups: [new ExpRex("FOO", tokenMap, expressionMap)]
+        });
+
+        expressionMap.set("Buzz", {
+          name: "Buzz",
+          groups: [new ExpRex("(?<@fizz>Fizz)", tokenMap, expressionMap)]
+        });
+
+        const rex = new ExpRex("(?<value>Buzz)", tokenMap, expressionMap);
+
+        expect(rex.match("FOO", "test")).toMatchSnapshot();
+      });
     });
   });
 
@@ -3477,6 +3587,7 @@ Object {
     },
   ],
   "isCompleteMatch": false,
+  "promotedMatch": Array [],
   "text": "",
   "tokens": Array [],
 }
@@ -3486,6 +3597,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -3509,6 +3621,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BAR",
   "tokens": Array [
     Token {
@@ -3532,6 +3645,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BAR",
   "tokens": Array [
     Token {
@@ -3559,6 +3673,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -3582,6 +3697,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BAR",
   "tokens": Array [
     Token {
@@ -3605,6 +3721,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BUZZ",
   "tokens": Array [
     Token {
@@ -3629,6 +3746,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -3652,6 +3770,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -3675,6 +3794,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BUZZ",
   "tokens": Array [
     Token {
@@ -3704,6 +3824,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO BUZZ",
   "tokens": Array [
     Token {
@@ -3740,6 +3861,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BAR BUZZ",
   "tokens": Array [
     Token {
@@ -3782,6 +3904,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FOO",
   "tokens": Array [
     Token {
@@ -3805,6 +3928,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BUZZ",
   "tokens": Array [
     Token {
@@ -3828,6 +3952,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BAR",
   "tokens": Array [
     Token {
@@ -3851,6 +3976,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "FIZZ",
   "tokens": Array [
     Token {
@@ -3874,6 +4000,7 @@ Object {
   "captures": Object {},
   "expected": Array [],
   "isCompleteMatch": true,
+  "promotedMatch": Array [],
   "text": "BAR",
   "tokens": Array [
     Token {
@@ -3887,6 +4014,226 @@ Object {
         },
       },
       "type": "BAR",
+      "values": Object {},
+    },
+  ],
+}
+`);
+    });
+  });
+
+  describe("left recursive", () => {
+    it("does not infinitely recurse a simple left-recursive expression", () => {
+      const expressionMap: Map<string, Expression> = new Map();
+      expressionMap.set("Fizz", {
+        name: "Fizz",
+        groups: [
+          new ExpRex("Fizz FOO", tokenMap, expressionMap),
+          new ExpRex("FOO", tokenMap, expressionMap)
+        ]
+      });
+
+      const exprex = new ExpRex("Fizz", tokenMap, expressionMap);
+
+      expect(exprex.match("FOO FOO", "test")).toMatchInlineSnapshot(`
+Object {
+  "captures": Object {},
+  "expected": Array [],
+  "isCompleteMatch": true,
+  "promotedMatch": Array [],
+  "text": "FOO FOO",
+  "tokens": Array [
+    Token {
+      "lexeme": "FOO",
+      "location": Object {
+        "end": Object {
+          "index": 3,
+        },
+        "start": Object {
+          "index": 0,
+        },
+      },
+      "type": "FOO",
+      "values": Object {},
+    },
+    Token {
+      "lexeme": "FOO",
+      "location": Object {
+        "end": Object {
+          "index": 7,
+        },
+        "start": Object {
+          "index": 4,
+        },
+      },
+      "type": "FOO",
+      "values": Object {},
+    },
+  ],
+}
+`);
+    });
+
+    it("finds a full expression on both sides", () => {
+      const expressionMap: Map<string, Expression> = new Map();
+      expressionMap.set("Expression", {
+        name: "Expression",
+        groups: [
+          new ExpRex("Buzz", tokenMap, expressionMap),
+          new ExpRex("FOO", tokenMap, expressionMap)
+        ]
+      });
+      expressionMap.set("Buzz", {
+        name: "Buzz",
+        groups: [
+          new ExpRex("Expression BAR Expression", tokenMap, expressionMap)
+        ]
+      });
+
+      const exprex = new ExpRex("Expression", tokenMap, expressionMap);
+
+      expect(exprex.match("FOO BAR FOO", "test")).toMatchInlineSnapshot(`
+Object {
+  "captures": Object {},
+  "expected": Array [],
+  "isCompleteMatch": true,
+  "promotedMatch": Array [],
+  "text": "FOO BAR FOO",
+  "tokens": Array [
+    Token {
+      "lexeme": "FOO",
+      "location": Object {
+        "end": Object {
+          "index": 3,
+        },
+        "start": Object {
+          "index": 0,
+        },
+      },
+      "type": "FOO",
+      "values": Object {},
+    },
+    Token {
+      "lexeme": "BAR",
+      "location": Object {
+        "end": Object {
+          "index": 7,
+        },
+        "start": Object {
+          "index": 4,
+        },
+      },
+      "type": "BAR",
+      "values": Object {},
+    },
+    Token {
+      "lexeme": "FOO",
+      "location": Object {
+        "end": Object {
+          "index": 11,
+        },
+        "start": Object {
+          "index": 8,
+        },
+      },
+      "type": "FOO",
+      "values": Object {},
+    },
+  ],
+}
+`);
+    });
+
+    it("walks nested expressions", () => {
+      const expressionMap: Map<string, Expression> = new Map();
+      expressionMap.set("Expression", {
+        name: "Expression",
+        groups: [
+          new ExpRex("Buzz", tokenMap, expressionMap),
+          new ExpRex("FOO", tokenMap, expressionMap)
+        ]
+      });
+      expressionMap.set("Buzz", {
+        name: "Buzz",
+        groups: [
+          new ExpRex("Expression BAR Expression", tokenMap, expressionMap)
+        ]
+      });
+
+      const exprex = new ExpRex("Expression", tokenMap, expressionMap);
+
+      expect(exprex.match("FOO BAR FOO BAR FOO", "test"))
+        .toMatchInlineSnapshot(`
+Object {
+  "captures": Object {},
+  "expected": Array [],
+  "isCompleteMatch": true,
+  "promotedMatch": Array [],
+  "text": "FOO BAR FOO BAR FOO",
+  "tokens": Array [
+    Token {
+      "lexeme": "FOO",
+      "location": Object {
+        "end": Object {
+          "index": 3,
+        },
+        "start": Object {
+          "index": 0,
+        },
+      },
+      "type": "FOO",
+      "values": Object {},
+    },
+    Token {
+      "lexeme": "BAR",
+      "location": Object {
+        "end": Object {
+          "index": 7,
+        },
+        "start": Object {
+          "index": 4,
+        },
+      },
+      "type": "BAR",
+      "values": Object {},
+    },
+    Token {
+      "lexeme": "FOO",
+      "location": Object {
+        "end": Object {
+          "index": 11,
+        },
+        "start": Object {
+          "index": 8,
+        },
+      },
+      "type": "FOO",
+      "values": Object {},
+    },
+    Token {
+      "lexeme": "BAR",
+      "location": Object {
+        "end": Object {
+          "index": 15,
+        },
+        "start": Object {
+          "index": 12,
+        },
+      },
+      "type": "BAR",
+      "values": Object {},
+    },
+    Token {
+      "lexeme": "FOO",
+      "location": Object {
+        "end": Object {
+          "index": 19,
+        },
+        "start": Object {
+          "index": 16,
+        },
+      },
+      "type": "FOO",
       "values": Object {},
     },
   ],

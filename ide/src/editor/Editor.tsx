@@ -247,9 +247,9 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
         if (this.editor != null) {
             const source = this.editor.getValue();
 
-            const parser = new Parser(source);
             let result: Error | ReturnType<Parser['parse']>;
             try {
+                const parser = new Parser(source);
                 result = parser.parse();
             } catch (e) {
                 result = e;
@@ -265,21 +265,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
             if (!isError(result)) {
                 if (result.isCompleteMatch === false) {
                     const expected = reduceExpectations(result.expected);
-
-                    const source = this.editor.getValue();
-                    let lineNumber = 1;
-                    let column = 1;
-
-                    for (let i = 0; i < expected[0].index; i++) {
-                        const char = source[i];
-
-                        if (char === '\n') {
-                            lineNumber++;
-                            column = 1;
-                        } else {
-                            column++;
-                        }
-                    }
+                    const [{ line, column }] = expected;
 
                     this.editor.addContentWidget({
                         getId: () => 'expectedOverlay',
@@ -288,7 +274,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
                             return {
                                 position: {
                                     column,
-                                    lineNumber,
+                                    lineNumber: line,
                                 },
                                 preference: [1, 2, 0] // ABOVE, BELOW, EXACT
                             };

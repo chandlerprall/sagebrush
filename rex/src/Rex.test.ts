@@ -620,6 +620,13 @@ describe('Rex', () => {
             expect(rex.match('foobarab')).toEqual({ text: 'ab', captures: {} });
             expect(rex.match('abc')).toEqual({ text: 'ab', captures: {} });
         });
+
+        it('allows the $ token to be anywhere in the input string', () => {
+            const rex = new Rex('a($|b)');
+            expect(rex.match('ab')).toEqual({ text: 'ab', captures: {} });
+            expect(rex.match('a')).toEqual({ text: 'a', captures: {} });
+            expect(rex.match('ac')).toBeUndefined();
+        });
     });
 
     describe('bound to start and end', () => {

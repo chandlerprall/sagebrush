@@ -47,6 +47,7 @@ export class RexNode {
 }
 
 export class RexMatchAny extends RexNode {}
+export class RexEnd extends RexNode {}
 
 export class RexChar extends RexNode {
     constructor(public char: string) {
@@ -86,6 +87,7 @@ export class RexOr extends RexNode {
 
 export type RexAstNode =
     RexMatchAny |
+    RexEnd |
     RexChar |
     RexCharacterSet |
     RexWhitespace |
@@ -136,6 +138,8 @@ export function parseRexAst(regex: string, captureGroups: string[] = []): RexAst
             }
         } else if (char === '.') {
             member = new RexMatchAny();
+        } else if (char === '$') {
+            member = new RexEnd();
         } else if (char === '|') {
             // upgrade this member to an OR group
             // all members seen so far belong to the left side
