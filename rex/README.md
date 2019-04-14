@@ -17,6 +17,7 @@
     * `\u{...}` matches unicode character with the given code point
     * all other escape sequences match the escaped character, e.g. `\\` for `\`, `\a` for `a`
 * greedy and non-greedy matching with `*`, `+`, `?`, `*?`, and `??`
+* repetitions `{n}`, `{min,}`, `{min,max}`
 * alternatives/or `|`
 * groups `()`
 * named capture groups `(?<capturename>)` - see [Named capture groups](#named-capture-groups)

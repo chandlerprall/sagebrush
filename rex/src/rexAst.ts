@@ -21,6 +21,55 @@ function readUnicodeEscapeSequence(input: string, cursor: number) {
     return hex;
 }
 
+const digitChars = new Set(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
+function readRepetitionSequence(input: string, cursor: number) {
+    let _min = '';
+    let _max = '';
+
+    let min = Infinity;
+    let max = -Infinity;
+
+    let isNonGreedy = false;
+
+    if (input[cursor] !== '{') throw new Error('Invalid repetition sequence');
+
+    let readingMin = true;
+    let consumedChars = 1;
+
+    for (let i = cursor + 1; i < input.length; i++) {
+        consumedChars++;
+        const char = input[i];
+
+        if (char === ',') {
+            if (_min.length === 0) throw new Error('Invalid repetition sequence');
+            readingMin = false;
+        } else if (char === '}') {
+            if (readingMin === true) {
+                max = min = parseInt(_min, 10);
+            } else {
+                min = parseInt(_min, 10);
+                max = _max.length > 0 ? parseInt(_max, 10) : Infinity;
+            }
+            break;
+        } else {
+            if (digitChars.has(char) === false) throw new Error('Invalid repetition sequence');
+
+            if (readingMin) {
+                _min += char;
+            } else {
+                _max += char;
+            }
+        }
+    }
+
+    if (input[cursor + consumedChars] === '?') {
+        isNonGreedy = true;
+        consumedChars++;
+    }
+
+    return { min, max, consumedChars, isNonGreedy };
+}
+
 export function unicodeRead(string: string, cursor: number) {
     let char: string | undefined;
 
@@ -67,14 +116,30 @@ export class RexNode {
     getMatchType() {
         return this.matchType;
     }
+
+    clone(): RexNode {
+        throw new Error('Class extends RexNode but does not override the clone method');
+    }
 }
 
-export class RexMatchAny extends RexNode {}
-export class RexEnd extends RexNode {}
+export class RexMatchAny extends RexNode {
+    clone() {
+        return new RexMatchAny();
+    }
+}
+export class RexEnd extends RexNode {
+    clone() {
+        return new RexEnd();
+    }
+}
 
 export class RexChar extends RexNode {
     constructor(public char: string) {
         super();
+    }
+
+    clone() {
+        return new RexChar(this.char);
     }
 }
 
@@ -82,14 +147,42 @@ export class RexCharacterSet extends RexNode {
     constructor(public isNegated: boolean, public chars: string[], public ranges: Array<[string, string]>, public matchers: Matcher[]) {
         super();
     }
+
+    clone() {
+        return new RexCharacterSet(this.isNegated, this.chars, this.ranges, this.matchers);
+    }
 }
 
-export class RexWhitespace extends RexNode {}
-export class RexNotWhitespace extends RexNode {}
-export class RexDigit extends RexNode {}
-export class RexNotDigit extends RexNode {}
-export class RexWord extends RexNode {}
-export class RexNotWord extends RexNode {}
+export class RexWhitespace extends RexNode {
+    clone() {
+        return new RexWhitespace();
+    }
+}
+export class RexNotWhitespace extends RexNode {
+    clone() {
+        return new RexNotWhitespace();
+    }
+}
+export class RexDigit extends RexNode {
+    clone() {
+        return new RexDigit();
+    }
+}
+export class RexNotDigit extends RexNode {
+    clone() {
+        return new RexNotDigit();
+    }
+}
+export class RexWord extends RexNode {
+    clone() {
+        return new RexWord();
+    }
+}
+export class RexNotWord extends RexNode {
+    clone() {
+        return new RexNotWord();
+    }
+}
 
 export enum GroupType {
     NORMAL = 'NORMAL',
@@ -100,11 +193,19 @@ export class RexGroup extends RexNode {
     constructor(public members: RexAstNode[], public captureNames: string[], public type: GroupType) {
         super();
     }
+
+    clone() {
+        return new RexGroup(this.members, this.captureNames, this.type);
+    }
 }
 
 export class RexOr extends RexNode {
     constructor(public left: RexAstNode[], public right: RexAstNode[]) {
         super();
+    }
+
+    clone() {
+        return new RexOr(this.left, this.right);
     }
 }
 
@@ -346,8 +447,43 @@ export function parseRexAst(regex: string, captureGroups: string[] = []): RexAst
                 member.isNonGreedy = true;
             }
         }
-        
-        members.push(member);
+
+        if (peek === '{') {
+            const {min, max, consumedChars, isNonGreedy} = readRepetitionSequence(regex, i + 1);
+
+            // add member as required the minimum number of times
+            for (let i = 0; i < min; i++) {
+                members.push(member);
+            }
+
+            if (max === Infinity) {
+                // unbounded
+                const unboundedMember = member.clone();
+                unboundedMember.setMatchType(MATCH_TYPE_ZERO_OR_MORE);
+                unboundedMember.isNonGreedy = isNonGreedy;
+                members.push(unboundedMember);
+            } else {
+                const optional = max - min;
+
+                if (optional > 0) {
+                    let subgroup = new RexGroup([member.clone()], [], GroupType.NORMAL);
+                    subgroup.setMatchType(MATCH_TYPE_ZERO_OR_ONE);
+                    subgroup.isNonGreedy = isNonGreedy;
+
+                    for (let i = 0; i < optional - 1; i++) {
+                        subgroup = new RexGroup([member.clone(), subgroup], [], GroupType.NORMAL);
+                        subgroup.setMatchType(MATCH_TYPE_ZERO_OR_ONE);
+                        subgroup.isNonGreedy = isNonGreedy;
+                    }
+
+                    members.push(subgroup);
+                }
+            }
+
+            i += consumedChars;
+        } else {
+            members.push(member);
+        }
     }
     
     return members;

@@ -372,6 +372,67 @@ describe('Rex', () => {
         });
     });
 
+    describe('repetition', () => {
+        it('matches a minimally and maximally repeated character', () => {
+            const rex = new Rex('a{2,4}');
+
+            expect(rex.match('a')).toBeUndefined();
+            expect(rex.match('aa')).toEqual({ text: 'aa', captures: {} });
+            expect(rex.match('aaa')).toEqual({ text: 'aaa', captures: {} });
+            expect(rex.match('aaaa')).toEqual({ text: 'aaaa', captures: {} });
+            expect(rex.match('aaaaa')).toEqual({ text: 'aaaa', captures: {} });
+        });
+
+        it('matches a minimally and maximally repeated character, non-greedily', () => {
+            const rex = new Rex('a{2,4}?');
+            expect(rex.match('a')).toBeUndefined();
+            expect(rex.match('aa')).toEqual({ text: 'aa', captures: {} });
+            expect(rex.match('aaa')).toEqual({ text: 'aa', captures: {} });
+            expect(rex.match('aaaa')).toEqual({ text: 'aa', captures: {} });
+            expect(rex.match('aaaaa')).toEqual({ text: 'aa', captures: {} });
+
+            const rex2 = new Rex('a{2,4}?b');
+            expect(rex2.match('aab')).toEqual({ text: 'aab', captures: {} });
+            expect(rex2.match('aaab')).toEqual({ text: 'aaab', captures: {} });
+            expect(rex2.match('aaaab')).toEqual({ text: 'aaaab', captures: {} });
+        });
+
+        it('matches a character an exact number of times', () => {
+            const rex = new Rex('a{3}');
+
+            expect(rex.match('a')).toBeUndefined();
+            expect(rex.match('aa')).toBeUndefined();
+            expect(rex.match('aaa')).toEqual({ text: 'aaa', captures: {} });
+            expect(rex.match('aaaa')).toEqual({ text: 'aaa', captures: {} });
+        });
+
+        it('matches a character un unbounded number of times', () => {
+            const rex = new Rex('a{3,}');
+
+            expect(rex.match('a')).toBeUndefined();
+            expect(rex.match('aa')).toBeUndefined();
+            expect(rex.match('aaa')).toEqual({ text: 'aaa', captures: {} });
+            expect(rex.match('aaaa')).toEqual({ text: 'aaaa', captures: {} });
+            expect(rex.match('aaaaa')).toEqual({ text: 'aaaaa', captures: {} });
+        });
+
+        it('matches a character un unbounded number of times, non-greedily', () => {
+            const rex = new Rex('a{3,}?');
+            expect(rex.match('a')).toBeUndefined();
+            expect(rex.match('aa')).toBeUndefined();
+            expect(rex.match('aaa')).toEqual({ text: 'aaa', captures: {} });
+            expect(rex.match('aaaa')).toEqual({ text: 'aaa', captures: {} });
+            expect(rex.match('aaaaa')).toEqual({ text: 'aaa', captures: {} });
+
+            const rex2 = new Rex('a{3,}?b');
+            expect(rex2.match('ab')).toBeUndefined();
+            expect(rex2.match('aab')).toBeUndefined();
+            expect(rex2.match('aaab')).toEqual({ text: 'aaab', captures: {} });
+            expect(rex2.match('aaaab')).toEqual({ text: 'aaaab', captures: {} });
+            expect(rex2.match('aaaaab')).toEqual({ text: 'aaaaab', captures: {} });
+        });
+    });
+
     describe('non-greedy matchers', () => {
         describe('non-greedy zero-or-more', () => {
             it('matches simple zero-or-more', () => {
