@@ -4,15 +4,19 @@ describe('Parser', () => {
     describe('parsing', () => {
         it('parses a thing', () => {
             const scanner = new Parser(`
-#token FOO FOO
+#token NUMBER (?<value>-?(\\d|[1-9]\\d+)(\\.\\d+)?([eE](+|-)?\\d+)?)
+#token LEFT_PAREN \\[
+#token RIGHT_PAREN \\]
+#token COMMA ,
 
-#expr Foo = (?<@foo>FOO)
+#expr Program = (?<json>Array)
 
-#expr Fizz = (?<@fizz>Foo)
+#expr Array = LEFT_PAREN ( (?<values>Value) ( COMMA (?<values>Value) )* )? RIGHT_PAREN
 
-#expr Program = (?<program>Fizz)
+#expr Value = (?<value>Array|NUMBER)
 
-FOO
+
+[1, 2, 
         `);
             // scanner.scan();
             // scanner.tokens.forEach(token => console.log(token.toString()));
@@ -60,7 +64,7 @@ FOO
 #token TWO_HEX \\\\x(?<hex>[a-zA-Z0-9][a-zA-Z0-9])
 #token FOUR_HEX \\\\u(?<hex>[a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9])
 
-#token UNICODE \\\\u{(?<hex>[a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9])}
+#token UNICODE \\\\u\\{(?<hex>[a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9])\\}
 
 #token UP_CARET \\^
 

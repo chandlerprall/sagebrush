@@ -254,7 +254,7 @@ Object {
   "expected": Array [
     Object {
       "expectant": "test",
-      "index": 3,
+      "index": 4,
       "message": "BAR token",
     },
   ],
@@ -1038,7 +1038,7 @@ Object {
   "expected": Array [
     Object {
       "expectant": "test",
-      "index": 3,
+      "index": 4,
       "message": "BAR token",
     },
   ],
@@ -1300,7 +1300,7 @@ Object {
   "expected": Array [
     Object {
       "expectant": "test",
-      "index": 3,
+      "index": 4,
       "message": "Fizz expression",
     },
   ],
@@ -2082,7 +2082,7 @@ Object {
   "expected": Array [
     Object {
       "expectant": "test",
-      "index": 3,
+      "index": 4,
       "message": "BAR token",
     },
   ],

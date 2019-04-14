@@ -298,7 +298,7 @@ export class MatchState {
                         if (match.hasOwnProperty('expression')) {
                             match = match as ExpressionMatch;
                             Array.prototype.push.apply(this.expected, match.match.expected.map(
-                                ({ expectant, message, index }) => ({ expectant, message, index: index - this.adjustedWhitespaceChars })
+                                ({ expectant, message, index }) => ({ expectant, message, index: index })
                             ));
                         }
                     });
@@ -398,7 +398,7 @@ export class MatchState {
             .filter(connection => connection.matcher instanceof EmptyMatcher === false)
             .map(connection => ({
                 expectant: this.expectant,
-                index: this.cursor,
+                index: this.cursor + this.adjustedWhitespaceChars,
                 message: connection.matcher.toString()
             }));
 

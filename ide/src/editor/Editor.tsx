@@ -319,6 +319,7 @@ export default class Editor extends React.Component<EditorProps, EditorState> {
 
     render() {
         const { showHelp } = this.state;
+
         return (
             <React.Fragment>
                 {
