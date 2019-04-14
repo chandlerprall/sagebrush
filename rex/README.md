@@ -14,6 +14,7 @@
     * digit `\d\D`
     * word `\w\W`, matches `[a-zA-Z0-9_]`
     * `\n`, `\r`, and `\t` are understood as their common whitespace equivalent
+    * `\u{...}` matches unicode character with the given code point
     * all other escape sequences match the escaped character, e.g. `\\` for `\`, `\a` for `a`
 * greedy and non-greedy matching with `*`, `+`, `?`, `*?`, and `??`
 * alternatives/or `|`

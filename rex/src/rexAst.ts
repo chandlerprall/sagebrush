@@ -1,10 +1,33 @@
 import {Matcher, DigitMatcher, WhitespaceMatcher, WordMatcher, NegatedMatcher} from './Rex';
 
+const hexCharacters = new Set(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F']);
+function readUnicodeEscapeSequence(input: string, cursor: number) {
+    if (input[cursor++] !== '{') throw new Error('Invalid unicode escape sequence');
+
+    let hex = '';
+
+    for (let i = cursor; i < input.length; i++) {
+        const char = input[i];
+
+        if (char === '}') break;
+
+        if (hexCharacters.has(char) === false) throw new Error('Invalid unicode escape sequence');
+
+        hex += char;
+    }
+
+    if (hex.length === 0) throw new Error('Invalid unicode escape sequence');
+
+    return hex;
+}
+
 export function unicodeRead(string: string, cursor: number) {
     let char: string | undefined;
 
     if (cursor < string.length) {
         char = string[cursor];
+
+        // read one or more bytes to resolve unicode characters
         const charCode = char.charCodeAt(0);
 
         if (charCode >= 0x0D00 && charCode <= 0xDBFF) {
@@ -101,6 +124,29 @@ export type RexAstNode =
 
 export function parseRexAst(regex: string, captureGroups: string[] = []): RexAstNode[] {
     if (regex.length === 0) throw new Error('Cannot parse empty regular expression');
+
+    // prepare escape sequences
+    let _regex = '';
+    for (let i = 0; i < regex.length;) {
+        let char = unicodeRead(regex, i)!;
+
+        if (char === '\\') {
+            if (regex[i+1] === 'u') {
+                // parse unicode escape sequence
+                const hex = readUnicodeEscapeSequence(regex, i + 2);
+                char = String.fromCodePoint(parseInt(hex, 16));
+                i += hex.length + 2;
+            } else {
+                const escapedChar = unicodeRead(regex, i + 1);
+                if (escapedChar === undefined) throw new Error('Illegal escape sequence');
+                char += escapedChar;
+            }
+        }
+
+        _regex += char;
+        i += char.length;
+    }
+    regex = _regex;
     
     const members: RexNode[] = [];
 
@@ -252,12 +298,12 @@ export function parseRexAst(regex: string, captureGroups: string[] = []): RexAst
                         matchers.push(new WordMatcher());
                     } else if (escapedChar === 'W') {
                         matchers.push(new NegatedMatcher(new WordMatcher()));
+                    } else if (escapedChar === 't') {
+                        chars.push('\t');
                     } else if (escapedChar === 'n') {
                         chars.push('\n');
                     } else if (escapedChar === 'r') {
                         chars.push('\r');
-                    } else if (escapedChar === 't') {
-                        chars.push('\t');
                     } else {
                         chars.push(escapedChar);
                     }

@@ -251,6 +251,15 @@ describe('Rex', () => {
             expect(rex.match('-')).toEqual({ text: '-', captures: {} });
         });
 
+        it('matches a unicode escape sequence', () => {
+            const rex = new Rex('[\\u{1F420}-\\u{1F42F}]');
+            expect(rex.match('🐠')).toEqual({ text: '🐠', captures: {} });
+            expect(rex.match('🐧')).toEqual({ text: '🐧', captures: {} });
+            expect(rex.match('🐯')).toEqual({ text: '🐯', captures: {} });
+            expect(rex.match('🐟')).toBeUndefined();
+            expect(rex.match('🐰')).toBeUndefined();
+        });
+
         describe('negated', () => {
             it('does not match negated characters', () => {
                 const rex = new Rex('[^ABC]');
@@ -709,6 +718,12 @@ describe('Rex', () => {
     });
 
     describe('unicode', () => {
+        it('matches a unicode escape sequence', () => {
+            const rex = new Rex('\\u{1f419}');
+            const octopus = '🐙';
+            expect(rex.match(octopus)).toEqual({ text: octopus, captures: {} });
+        });
+
         it('matches a unicode character as a single character', () => {
             const rex = new Rex('.');
             const octopus = '🐙';
